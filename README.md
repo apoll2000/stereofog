@@ -173,4 +173,7 @@ tbd
 
 ## Collected dataset
 
+*description & details of the collected dataset*
 ## pix2pix on dataset
+
+*ML results on dataset*
