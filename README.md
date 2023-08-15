@@ -1,8 +1,47 @@
 # stereofog
-This repository documents a research project carried out at the [Laboratory for Optical Nanotechnologies](https://nanoptics.wordpress.com) at the University of Utah under supervision of [Prof. Rajesh Menon](https://faculty.utah.edu/u0676529-Rajesh_Menon/research/index.hml) in Summer 2023 (July-September). It was funded as part of the [RISE program](https://www.daad.de/rise/en/) by the [German Academic Exchange Service (Deutscher Akademischer Austauschdienst (DAAD))](https://en.wikipedia.org/wiki/German_Academic_Exchange_Service).
 
+<p align="center">
+<img src="images/stereofog_logo.png" alt="OpenMV H7 camera" width="275"/>
+</p>
 
+<p align="center">
+<font size = "1"> logo image attributions: <a href="https://commons.wikimedia.org/wiki/File:Utah_Utes_-_U_logo.svg">U of U</a> | <a href="https://commons.wikimedia.org/wiki/File:Deutscher_Akademischer_Austauschdienst_logo.svg">DAAD</a></font>
+</p>
+
+This repository documents a research project carried out at the [Laboratory for Optical Nanotechnologies](https://nanoptics.wordpress.com) at the University of Utah under supervision of [Prof. Rajesh Menon](https://faculty.utah.edu/u0676529-Rajesh_Menon/research/index.hml) in Summer (July-September) 2023. It was funded as part of the [RISE program](https://www.daad.de/rise/en/) by the [German Academic Exchange Service (Deutscher Akademischer Austauschdienst (DAAD))](https://en.wikipedia.org/wiki/German_Academic_Exchange_Service).
+
+*potentially add some cool gifs here*
 *insert preliminary results, logos, images, etc. as teaser here*
+
+
+ fogged image  |  real image  |   synthetic image 
+:-------------------------:|:-------------------------:|:-------------------------:
+![](images/01-04_08_23__736_B.bmp) |  ![](images/01-04_08_23__736_A.bmp) | ![](images/01-04_08_23__736_A.bmp)
+
+
+## Table of Contents
+- [stereofog](#stereofog)
+  - [Table of Contents](#table-of-contents)
+  - [Goal](#goal)
+  - [Potential applications](#potential-applications)
+  - [Project timeline](#project-timeline)
+  - [Image capturing device](#image-capturing-device)
+    - [Requirements](#requirements)
+    - [Cameras](#cameras)
+    - [Image trigger](#image-trigger)
+    - [Wiring \& Programming](#wiring--programming)
+    - [Gimbal](#gimbal)
+    - [Case](#case)
+    - [Bla?](#bla)
+  - [Python environment](#python-environment)
+  - [Synthetic data](#synthetic-data)
+    - [Foggy Cityscapes from Uni Tübingen](#foggy-cityscapes-from-uni-tübingen)
+    - [Foggy Cityscapes from ETH Zürich](#foggy-cityscapes-from-eth-zürich)
+    - [Foggy Carla from Uni Tübingen](#foggy-carla-from-uni-tübingen)
+    - [Foggy KITTI from Uni Tübingen (?)](#foggy-kitti-from-uni-tübingen-)
+  - [Collected dataset](#collected-dataset)
+  - [pix2pix on dataset](#pix2pix-on-dataset)
+
 
 ## Goal
 This project had three objectives:
@@ -10,6 +49,12 @@ This project had three objectives:
 1. build a device capable of capturing paired images that depict the same scenery, one image with fog and the other without
 2. collect a dataset of paired images
 3. apply the [pix2pix model](https://phillipi.github.io/pix2pix/) developed at the University of California, Berkeley to the translation problem **fog &rarr; no fog**
+
+## Potential applications
+
+* Autonomous driving
+* Search & rescue (wildfires, home fires, etc.)
+* Military
 
 ## Project timeline
 ![project timeline](images/gantt_chart_stereofog.png "project timeline")
@@ -136,10 +181,21 @@ In order to stabilize the images while walking and ensure they are approximately
 
 ### Case
 
-In order to be able to capture approximately the same image, ...
+In order to be able to capture approximately the same image, the cameras had to be mounted as close together as possible. Simultaneously, the case must be able to hold the fog surrounding one camera while isolating the other camera from the influence of the fog, keeping all other conditions the same.
+
+Therefore, both cameras are arranged side by side, inside separate chambers. The setup of the initial prototype put the box with the two cameras far above axis of rotation of the gimbal. The resulting torque to keep the construction level was too high in this configuration, causing the gimbal to shut off regularly.
+
+<p align="center">
+<img src="images/first_prototype.gif" alt="first prototype" width="150"/>
+<figcaption align = "center"><b>The gimbal failing to keep the first prototype level</b></figcaption>
+</p>
+
+
+The case was designed in [Fusion 360](https://www.autodesk.com/products/fusion-360/overview). Some 3D printed files were printed using a [Creality Ender 3 Pro](https://www.creality3dofficial.com/products/ender-3-pro-3d-printer), some on an [Ultimaker S3](https://ultimaker.com/3d-printers/ultimaker-s3). The front plate was lasercut on a CO2 laser cutter.
 
 <p align="center">
 <img src="images/gimbal_mount_3D_print.png" alt="CAD file of the gimbal mount" width="250"/>
+<figcaption align = "center"><b>CAD file of the gimbal bridge</b></figcaption>
 </p>
 <p align="center">
 <img src="images/gimbal_bridge_3D_print.png" alt="CAD file of the gimbal mount" width="200"/>
@@ -151,7 +207,7 @@ In order to be able to capture approximately the same image, ...
 <img src="images/fog_device_assembly_3D_print_box_rear.png" alt="CAD file of the gimbal mount" width="600"/>
 </p>
 
-### 
+### Bla?
 
 ## Python environment
 
