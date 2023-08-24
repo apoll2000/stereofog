@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>\
+
+<dc:title>StereoFog Dataset</dc:title>\
+<dc:creator>Anton Pollak</dc:creator>\
+<dc:creator>Rajesh Menon</dc:creator>\
+<dc:subject>defogging</dc:subject>\
+<dc:subject>image-to-image translation</dc:subject>\
+<dc:subject>pix2pix</dc:subject>\
+<dc:subject>machine learning</dc:subject>\
+<dc:description>A dataset collected as part of the sterefog research project at the University of Utah.</dc:description>\
+<dc:publisher>Anton Pollak</dc:publisher>\
+<dc:publisher>Rajesh Menon</dc:publisher>\
+<dc:date>26 September 2023</dc:date>\
+<dc:type>images</dc:type>\
+<dc:format>Bitmap (.bmp)</dc:format>\
+<dc:identifier>DOI here</dc:identifier>\
+<dc:language>eng</dc:language>\
+<dc:rights>Creative Commons attribute author non-commercial</dc:rights>}

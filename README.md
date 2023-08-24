@@ -218,7 +218,7 @@ Therefore, both cameras are arranged side by side, inside separate chambers. The
 </p>
 
 
-The case was designed in [Fusion 360](https://www.autodesk.com/products/fusion-360/overview). Some 3D printed files were printed using a [Creality Ender 3 Pro](https://www.creality3dofficial.com/products/ender-3-pro-3d-printer), some on an [Ultimaker S3](https://ultimaker.com/3d-printers/ultimaker-s3). The front plate was lasercut on a CO2 laser cutter.
+The case was designed in [Fusion 360](https://www.autodesk.com/products/fusion-360/overview). Some 3D printed files were printed using a [Creality Ender 3 Pro](https://www.creality3dofficial.com/products/ender-3-pro-3d-printer), some on an [Ultimaker S3](https://ultimaker.com/3d-printers/ultimaker-s3). The front plate was lasercut on a CO<sub>2</sub> laser cutter.
 
 <p align="center">
 <img src="images/gimbal_mount_3D_print.png" alt="CAD design of the gimbal mount" width="250"/>
@@ -258,23 +258,48 @@ DIN912 M3 25mm screw | [3Dfindit](https://www.3dfindit.com/en/digitaltwin/hexago
 
 All code was run on Python `3.9.7` with the following packages installed:
 
+- `numpy`
+- `opencv-python`
+- `matplotlib`
+- `torch`
+- ...
+
 The packages are listed in the `requirements.txt` and can be installed with:
 ```bash
 pip install -r requirements.txt
 ```
 
+For the training of the pix2pix model, CUDA acceleration was used.
+
 *Python version, requirements.txt, CUDA acceleration, etc.*
 
+## Getting started
+*descriptions on how to get up and running*
+
+## Training
+
+The models were trained on a lab computer equipped with a dedicated GPU (NVIDIA GeForce GTX 970) and 64 GB of RAM.
+
+All models were trained for the default 200 epochs for the pix2pix model. The training time increased along with the size of the dataset. For the final model, the training time was around 20 hours.
+
 ## Synthetic data
-Uni Tübingen, Germany...
+At the beginning of the project, we experimented with synthetic datasets in combination with the pix2pix model. The datasets used were based on the [Cityscapes dataset](https://www.cityscapes-dataset.com/) as well as on images derived from the [CARLA simulator](https://carla.org/).
+The fog simulations generally work either by directly using a depth map that is available for each particular image, or by using the left and right images to calculate the depths in the images, thus reconstructing this depth map. This depth map helps in estimating how strongly the fog affects different parts of the image.
 
-### Foggy Cityscapes from Uni Tübingen
+### Semi-synthetic datasets
+The datasets in the following are semi-synthetic, meaning that they work with real images, to which the fog has been added synthetically. A disadvantage of this method is that the depth map is never perfect, which can lead to artifacts in the fogged images.
 
-### Foggy Cityscapes from ETH Zürich
+#### Foggy Cityscapes from Uni Tübingen
+In cooperation with the researchers [Georg Volk](https://www.embedded.uni-tuebingen.de/en/team/georg-volk/) and  for the University of Tübingen, Germany, we trained a model on synthetic data generated for their paper ["Simulating Photo-realistic Snow and Fog on Existing Images for Enhanced CNN Training and Evaluation"](https://embedded.uni-tuebingen.de/assets/publications/vonBernuth-Volk-Bringmann_Snow_Fog.pdf).
 
-[Link](http://people.ee.ethz.ch/~csakarid/SFSU_synthetic/)
+#### Foggy Cityscapes from ETH Zürich
+Another dataset taken into consideration was the [Foggy Cityscapes dataset](http://people.ee.ethz.ch/~csakarid/SFSU_synthetic/) from the paper ["Semantic Foggy Scene Understanding with Synthetic Data"](http://people.ee.ethz.ch/~csakarid/SFSU_synthetic/Semantic_foggy_scene_understanding_with_synthetic_data-Sakaridis+Dai+Van_Gool-IJCV-AAM.pdf) by [Sakaridis et al.](https://people.ee.ethz.ch/~csakarid/). The dataset was created by the [Computer Vision Lab](https://www.vision.ee.ethz.ch/en/) of ETH Zürich, Switzerland.
 
-### Foggy Carla from Uni Tübingen
+### Fully synthetic datasets
+The following dataset was created entirely synthetically. The original images were rendered using a driving simulator, which generated the matching perfect depth maps as well. This way, the fogged images do not show any artifacts.
+
+#### Foggy Carla from Uni Tübingen
+
 
 ### Foggy KITTI from Uni Tübingen (?)
 tbd
@@ -303,3 +328,8 @@ The cameras were used in spite of this issue because of their advantages in prog
 ### Weather conditions
 
 As just mentioned, the images show almost exclusively sunny scenes. This is due to them being collected during August, which is the clearest month of the year in Salt Lake City, with [the sky being clear around 78% of the time](https://weatherspark.com/y/2706/Average-Weather-in-Salt-Lake-City-Utah-United-States-Year-Round). The few times it was raining, the camera was not used to avoid damage to the electronics.
+
+
+# References
+
+* [1]:
