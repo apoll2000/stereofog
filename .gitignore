@@ -159,6 +159,18 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+# Large folders
+datasets
+models
+results
+backup
+checkpoints
+data
+docs
+options
+scripts
+util
+
 # Random user-defined files
 Utah_Utes_-_U_logo.png
 Deutscher_Akademischer_Austauschdienst_logo.png
