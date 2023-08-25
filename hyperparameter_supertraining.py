@@ -22,6 +22,7 @@ scripts = [
     "hyperparameter_NetDmode.py"
     "hyperparameter_NetGmode.py",
     "hyperparameter_GANmode.py",
+    "hyperparameter_ngf_ndf.py"
 ]
 
 for script in scripts:
