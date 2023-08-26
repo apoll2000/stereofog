@@ -42,7 +42,7 @@ test_script = []
 for rate in dropout_rates:
     test_script.append(
         f"python test.py --dataroot {dataroot} --name hyperparameter_dropout_{rate} --model pix2pix"
-        f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_dropout_{rate}'}"
+        f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_dropout'}"
     )
 
 # Run the test commands

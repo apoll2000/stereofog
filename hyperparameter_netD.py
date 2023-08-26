@@ -8,6 +8,7 @@ parser.add_argument('--n_epochs', type=int, default=25, help='number of epochs w
 parser.add_argument('--n_epochs_decay', type=int, default=15, help='number of epochs to linearly decay learning rate to zero')
 parser.add_argument('--num_test', type=int, default=50, help='number of test images')
 
+
 args = parser.parse_args()
 
 dataroot = args.dataroot
@@ -15,17 +16,19 @@ n_epochs = args.n_epochs
 n_epochs_decay = args.n_epochs_decay
 num_test = args.num_test
 
-# List of generator architectures to test
-netG_archictectures = ['resnet_9blocks', 'resnet_6blocks', 'unet_256', 'unet_128']
+checkpoints_dir = "checkpoints/hyperparameters/hyperparameter_netD"
+
+# List of discriminator architectures to test
+netD_architectures = ["basic", "n_layers", "pixel"]
 
 # List of commands to run
 commands = []
 
 # Generate the commands
-for netG in netG_archictectures:
+for netD in netD_architectures:
     commands.append(
-        f"python train.py --dataroot {dataroot} --name hyperparameter_netG_{netG} --model pix2pix "
-        f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --netG {netG}"
+        f"python train.py --dataroot {dataroot} --name hyperparameter_netD_{netD} --model pix2pix "
+        f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --netD {netD} --checkpoints_dir {checkpoints_dir}"
     )
 
 # Run the commands
@@ -37,10 +40,10 @@ for command in commands:
 test_script = []
 
 # Generate the test commands
-for netG in netG_archictectures:
+for netD in netD_architectures:
     test_script.append(
-        f"python test.py --dataroot {dataroot} --name hyperparameter_netG_{netG} --model pix2pix "
-        f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_netG_{netG}'}"
+        f"python test.py --dataroot {dataroot} --name hyperparameter_netD_{netD} --model pix2pix "
+        f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_netD'} --netD {netD} --checkpoints_dir {checkpoints_dir}"
     )
 
 # Run the test commands
@@ -48,4 +51,4 @@ for command in test_script:
     print("Running command:", command)
     subprocess.call(command, shell=True)
 
-print("All hyperparameter tests for netG mode completed.")
+print("All hyperparameter tests for netD mode completed.")

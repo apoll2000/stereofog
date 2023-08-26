@@ -15,32 +15,34 @@ n_epochs = args.n_epochs
 n_epochs_decay = args.n_epochs_decay
 num_test = args.num_test
 
-# List of discriminator architectures to test
-netD_architectures = ["basic", "n_layers", "pixel"]
+checkpoints_dir = "checkpoints/hyperparameters/hyperparameter_netG"
+
+# List of generator architectures to test
+netG_archictectures = ['resnet_9blocks', 'resnet_6blocks', 'unet_256', 'unet_128']
 
 # List of commands to run
 commands = []
 
 # Generate the commands
-for netD in netD_architectures:
+for netG in netG_archictectures:
     commands.append(
-        f"python train.py --dataroot {dataroot} --name hyperparameter_netD_{netD} --model pix2pix "
-        f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --netD {netD}"
+        f"python train.py --dataroot {dataroot} --name hyperparameter_netG_{netG} --model pix2pix "
+        f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --netG {netG} --checkpoints_dir {checkpoints_dir}"
     )
 
-# Run the commands
-for command in commands:
-    print("Running command:", command)
-    subprocess.call(command, shell=True)
+# # Run the commands
+# for command in commands:
+#     print("Running command:", command)
+#     subprocess.call(command, shell=True)
 
 # Testing script
 test_script = []
 
 # Generate the test commands
-for netD in netD_architectures:
+for netG in netG_archictectures:
     test_script.append(
-        f"python test.py --dataroot {dataroot} --name hyperparameter_netD_{netD} --model pix2pix "
-        f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_netD_{netD}'}"
+        f"python test.py --dataroot {dataroot} --name hyperparameter_netG_{netG} --model pix2pix "
+        f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_netG'} --netG {netG} --checkpoints_dir {checkpoints_dir}"
     )
 
 # Run the test commands
@@ -48,4 +50,4 @@ for command in test_script:
     print("Running command:", command)
     subprocess.call(command, shell=True)
 
-print("All hyperparameter tests for netD mode completed.")
+print("All hyperparameter tests for netG mode completed.")

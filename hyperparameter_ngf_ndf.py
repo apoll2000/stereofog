@@ -44,13 +44,13 @@ test_script = []
 for ngf in n_gen_filters:
     test_script.append(
         f"python test.py --dataroot {dataroot} --name hyperparameter_ngf_{ngf} --model pix2pix "
-        f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_ngf_{ngf}'}"
+        f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_ngf'} --ngf {ngf}"
     )
 
 for ndf in n_discrim_filters:
     test_script.append(
         f"python test.py --dataroot {dataroot} --name hyperparameter_ndf_{ndf} --model pix2pix "
-        f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_ndf_{ndf}'}"
+        f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_ndf_'} --ndf {ndf}"
     )
 
 # Run the test commands

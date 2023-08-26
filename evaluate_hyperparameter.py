@@ -11,11 +11,13 @@ parser.add_argument('--results_path', required=True, help='path to the results f
 parser.add_argument('--ratio', type=float, default=4/3, help='aspect ratio of the images (to undo the transformation from pix2pix model)')
 parser.add_argument('--num_images', type=int, default=5, help='number of images to plot for evaluation')
 parser.add_argument('--shuffle', action='store_true', help='if specified, shuffle the images before plotting')
+parser.add_argument('--flip', action='store_true', help='if specified, make the rows correspond to different test images, not different models (i.e., rows and columns are flipped)')
 
 results_path = parser.parse_args().results_path
 ratio = parser.parse_args().ratio
 num_images = parser.parse_args().num_images
 shuffle = parser.parse_args().shuffle
+flip = parser.parse_args().flip
 
 hyperparameter = results_path.split('/')[-1].replace('hyperparameter_', '')
 
@@ -50,36 +52,63 @@ limit = len(images_to_plot)
 width_per_image = 4
 height_per_image = width_per_image / ratio
 
-fig, ax = plt.subplots(num_models+2, limit, figsize=(limit*width_per_image,(num_models+2)*height_per_image)) # num_models+2 to acommodate ground truth and fogged image
-
 # ax = [fig.add_subplot(num_models+2,limit,i+1) for i in range(limit*(num_models+2))]
 
 # ax[0].text(0.5, 1.05, 'fake', fontsize=15, color='k', fontweight='black', ha='center', transform=ax[0].transAxes)
 # ax[1].text(0.5, 1.05, 'foggy real', fontsize=15, color='k', fontweight='black', ha='center', transform=ax[1].transAxes)
 # ax[2].text(0.5, 1.05, 'clear real', fontsize=15, color='k', fontweight='black', ha='center', transform=ax[2].transAxes)
 
-ax[0, 0].text(-0.1,0.5, 'original', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
-ax[1, 0].text(-0.1,0.5, 'fogged', transform=ax[1, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
+if flip:
+    fig, ax = plt.subplots(limit, num_models+2, figsize=(width_per_image*(num_models+2), height_per_image*limit))
 
-for i in range(limit):
+    ax[0, 0].text(0.5,1.1, 'fogged', transform=ax[0, 1].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k')
+    ax[0, 1].text(0.5,1.1, 'original', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k')
 
-    # Plotting the ground truth image
-    img_original = plt.imread(os.path.join(results_path, subfolders[0], subpath_addition, images_to_plot[i][:-10] + 'real_A' + '.png'))
-    ax[0, i].imshow(img_original, aspect='auto')
-    ax[0, i].axis('off')
+    for i in range(limit):
 
-    # Plotting the fogged image
-    img_fogged = plt.imread(os.path.join(results_path, subfolders[0], subpath_addition, images_to_plot[i][:-10] + 'real_B' + '.png'))
-    ax[1, i].imshow(img_fogged, aspect='auto')
-    ax[1, i].axis('off')
+        # Plotting the ground truth image
+        img_original = plt.imread(os.path.join(results_path, subfolders[0], subpath_addition, images_to_plot[i][:-10] + 'real_A' + '.png'))
+        ax[i, 0].imshow(img_original, aspect='auto')
+        ax[i, 0].axis('off')
 
-    # Plotting each of the model's results
-    for j in range(num_models):
-        img = plt.imread(os.path.join(results_path, subfolders[j], subpath_addition, images_to_plot[i]))
-        ax[j+2, i].imshow(img, aspect='auto')
-        if i == 0:
-            ax[j+2, i].text(-0.1,0.5, models[j], transform=ax[j+2, i].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
-        ax[j+2, i].axis('off')
+        # Plotting the fogged image
+        img_fogged = plt.imread(os.path.join(results_path, subfolders[0], subpath_addition, images_to_plot[i][:-10] + 'real_B' + '.png'))
+        ax[i, 1].imshow(img_fogged, aspect='auto')
+        ax[i, 1].axis('off')
+
+        # Plotting each of the model's results
+        for j in range(num_models):
+            img = plt.imread(os.path.join(results_path, subfolders[j], subpath_addition, images_to_plot[i]))
+            ax[i, j+2].imshow(img, aspect='auto')
+            if i == 0:
+                ax[i, j+2].text(0.5,1.1, models[j], transform=ax[i, j+2].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k')
+            ax[i, j+2].axis('off')
+
+else:
+    fig, ax = plt.subplots(num_models+2, limit, figsize=(limit*width_per_image,(num_models+2)*height_per_image)) # num_models+2 to acommodate ground truth and fogged image
+
+    ax[0, 0].text(-0.1,0.5, 'fogged', transform=ax[1, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
+    ax[1, 0].text(-0.1,0.5, 'original', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
+
+    for i in range(limit):
+
+        # Plotting the ground truth image
+        img_original = plt.imread(os.path.join(results_path, subfolders[0], subpath_addition, images_to_plot[i][:-10] + 'real_A' + '.png'))
+        ax[0, i].imshow(img_original, aspect='auto')
+        ax[0, i].axis('off')
+
+        # Plotting the fogged image
+        img_fogged = plt.imread(os.path.join(results_path, subfolders[0], subpath_addition, images_to_plot[i][:-10] + 'real_B' + '.png'))
+        ax[1, i].imshow(img_fogged, aspect='auto')
+        ax[1, i].axis('off')
+
+        # Plotting each of the model's results
+        for j in range(num_models):
+            img = plt.imread(os.path.join(results_path, subfolders[j], subpath_addition, images_to_plot[i]))
+            ax[j+2, i].imshow(img, aspect='auto')
+            if i == 0:
+                ax[j+2, i].text(-0.1,0.5, models[j], transform=ax[j+2, i].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
+            ax[j+2, i].axis('off')
 
 plt.subplots_adjust(hspace=0, wspace=0)
 plt.savefig(os.path.join(f"{results_path}", f"{hyperparameter}_evaluation.png"), bbox_inches='tight', pad_inches=0)
