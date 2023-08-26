@@ -1,14 +1,3 @@
-<style>
-    /* initialise the counter https://tamarisk.it/automatically-numbering-figures-in-markdown/ */
-    body { counter-reset: figureCounter; }
-    /* increment the counter for every instance of a figure even if it doesn't have a caption */
-    figure { counter-increment: figureCounter; }
-    /* prepend the counter to the figcaption content */
-    figure figcaption:before {
-        content: "Fig " counter(figureCounter) ": "
-    }
-</style>
-
 # stereofog
 
 <p align="center">
@@ -75,6 +64,10 @@ This project had three objectives:
 
 
 ## Image capturing device
+
+<details>
+<summary><strong>click to expand</strong></summary>
+
 ### Requirements
 
 The device had to be able to:
@@ -239,6 +232,12 @@ The case was designed in [Fusion 360](https://www.autodesk.com/products/fusion-3
 <figcaption align = "center"><b>Rear view of entire CAD design</b></figcaption>
 </p>
 
+### Bill of Materials
+The following components are required for the device:
+
+- 2x [OpenMV H7 camera](https://openmv.io/collections/products/products/openmv-cam-h7)
+- ...
+
 ### CAD file attributions
 
 Several parts of the CAD model were adopted from different sources. They are attributed in the following:
@@ -254,35 +253,131 @@ Toggle switch | [GrabCAD](https://grabcad.com/library/toggle-switch-37) | [unkno
 DIN912 M3 25mm screw | [3Dfindit](https://www.3dfindit.com/en/digitaltwin/hexagon-socket-head-cap-screws?path=fabory%2F2_socket_products_and_set_screws%2Fdin_912.prj&mident=%7Bfabory%2F2_socket_products_and_set_screws%2Fdin_912.prj%7D%2C016+%7BLINEID%3D50640%7D++%7BNB%3DZylinderschraube+DIN+912+M2x25+55050.020.025%28High%29%7D%2C%7BCNSORDERNO%3D55050.020.025%7D%2C%7BNENNID%3DM2X25%7D%2C%7BD%3D2.0%7D%2C%7BL%3D25.0%7D%2C%7BBRAND%3DFabory%7D%2C%7BSTANDARD%3DDIN+912%7D%2C%7BTHREAD%3DMetric+thread%7D%2C%7BTHREADDIRECTIO%3DRight%7D%2C%7BSTYLE%3D%7D%2C%7BTYPE%3DSocket+cap+screw%7D%2C%7BBASICMATERIAL%3DStainless+steel%7D%2C%7BGRADE%3DA4-70%7D%2C%7BSURFACETREATME%3D%7D%2C%7BHEADSHAPE%3DCylindrical+head%7D%2C%7BDRIVINGFFEATURE%3DHexagon+socket%7D%2C%7BCOLOR%3D%7D%2C%7BCOMPARABLESTAN%3DISO4762%2CASMEB18.3.1M%2CBS4168-1%2CNEN1241%2CNFE25-125%7D%2C%7BADDITIONALINFO%3D%7D%2C%7BROHS%3DY%7D%2C%7BAPPROVAL%3D%7D%2C%7BEANCODE%3D8715494620321%7D%2C%7BINTRASTATCODE%3D73181562%7D%2C%7BECLASS%3D23-11-06-27%7D%2C%7BUNSPSC%3D31161605%7D%2C%7BETIM%3DEC002356%7D%2C%7BPACKAGING%3D500%7D%2C%7BTL%3D0.000%7D%2C%7BVARIANT%3D1%7D%2C%7BFAB_NENN%3DM2x25%7D%2C%7BFAB_GEO%3Db%3D16%3Bd%3DM2%3Bdk+%28max.%29%3D3.8%3BFull+thread+L+%3F%3D20%3Bk+%28max.%29%3D2%3BLength+%28L%29%3D25%3BP%3D0.4%3Bs%3D1.5%7D%2C%7BFAB_ARTICLENUMBER%3D%7D%2C%7BFABNETWEIGHT%3D0.001%7D%2C%7BGEWINDE%3D0%7D%2C%7BP%3D0.400%7D%2C%7BBX%3D16.000%7D%2C%7BDK%3D3.800%7D%2C%7BDA%3D2.600%7D%2C%7BDS%3D2.000%7D%2C%7BE%3D1.730%7D%2C%7BF%3D0.510%7D%2C%7BK%3D2.000%7D%2C%7BR%3D0.100%7D%2C%7BS%3D1.500%7D%2C%7BT%3D1.000%7D%2C%7BV%3D0.200%7D%2C%7BDW%3D3.480%7D%2C%7BW%3D0.550%7D%2C%7BCNSAVOID%3D0%7D%2C%7BLOD%3DHigh%7D%2C%7BSTANDARDSMALL%3Ddin_912.png%7D) | [unknown](https://en.wikipedia.org/wiki/Rick_Astley)
 </p>
 
-## Python environment
+</details>
 
-All code was run on Python `3.9.7` with the following packages installed:
-
-- `numpy`
-- `opencv-python`
-- `matplotlib`
-- `torch`
-- ...
-
-The packages are listed in the `requirements.txt` and can be installed with:
-```bash
-pip install -r requirements.txt
-```
-
-For the training of the pix2pix model, CUDA acceleration was used.
-
-*Python version, requirements.txt, CUDA acceleration, etc.*
-
-## Getting started
-*descriptions on how to get up and running*
-
-## Training
+## Model Training
 
 The models were trained on a lab computer equipped with a dedicated GPU (NVIDIA GeForce GTX 970) and 64 GB of RAM.
 
 All models were trained for the default 200 epochs for the pix2pix model. The training time increased along with the size of the dataset. For the final model, the training time was around 20 hours.
 
+## Getting started
+*descriptions on how to get up and running*
+
+<details>
+<summary><strong>click to expand</strong></summary>
+
+
+### 1. Cloning the repository
+
+Clone the repository using `git`:
+```bash
+git clone https://github.com/apoll2000/stereofog.git
+```
+
+Navigate into the repository:
+```bash
+cd stereofog
+```
+
+### 2. Installing a Python environment
+
+Next, an appropriate Python environment needs to be created. All code was run on Python `3.9.7`. For creating the environment, either [`conda`](https://www.anaconda.com) or [`pyenv virtualenv`](https://github.com/pyenv/pyenv-virtualenv) can be used.
+
+---
+The environment can be created using `conda` with:
+```bash
+conda create --name stereofog python=3.9.7
+```
+
+Or using `pyenv virtualenv` with:
+```bash
+pyenv virtualenv 3.9.7 stereofog
+```
+---
+Then activate the environment with:
+```bash
+conda activate stereofog
+```
+Or:
+```bash
+pyenv activate stereofog
+```
+
+---
+Using `pip`, the required packages can then be installed. (for `conda` environments, execute
+```bash
+conda install pip
+```
+before to install pip). The packages are listed in the `requirements.txt` and can be installed with:
+```bash
+pip install -r requirements.txt
+```
+
+In case you want to install them manually, the packages include:
+
+- `numpy`
+- `torch`
+- `opencv-python`
+- `matplotlib`
+- ...
+
+It is important that you specify the right `torch` version if you would like to use your CUDA-enabled GPU to train the model, which will drastically reduce training time. See the [PyTorch website](https://pytorch.org/get-started/locally/) for more information.
+
+### 3. Downloading the dataset
+
+The dataset is currently being hosted here:
+[TUBCloud](https://tubcloud.tu-berlin.de/s/TWW4ABJSarpZ7Mc). Depending on the further development of the project, this might not be the final storing location.
+
+Place the `stereofog_images` folder into the `datasets` folder of the repository:
+
+```bash
+-- datasets
+    |-- stereofog_images
+        |-- 2023-08-03-04
+            |-- A
+                |-- 01-04_08_23__1.bmp
+                |-- 01-04_08_23__2.bmp
+                |-- ...
+            |-- B
+                |-- 01-04_08_23__1.bmp
+                |-- 01-04_08_23__2.bmp
+                |-- ...
+        |-- ...
+```
+
+### 4. Preparing the dataset
+
+The dataset needs to be prepared for training. This includes transforming the folder structure into one compatible with the pix2pix framework and splitting the dataset into training, validation and testing sets. It can be performed using the following command:
+```bash
+python preprocess_stereofog_dataset.py --dataroot path/to/dataset
+```
+
+### 5. Training a model
+
+The model training can be started using the following command:
+```bash
+python train.py --dataroot path/to/dataset --name name_of_model --model pix2pix --direction BtoA --gpu_ids 0
+```
+
+### 6. Testing a model
+
+```bash
+python test.py --dataroot path/to/dataset --direction BtoA --model pix2pix --name name_of_model
+```
+
+Ample information on the training and testing process and their parameters can be found on the [pix2pix GitHub page](https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/tree/master).
+
+</details>
+
+### 7. Helper scripts
+This GitHub page includes several helper scripts to perform different actions like hyperparameter tuning or epoch visualization...
+
 ## Synthetic data
+
+<details>
+<summary><strong>click to expand</strong></summary>
+
 At the beginning of the project, we experimented with synthetic datasets in combination with the pix2pix model. The datasets used were based on the [Cityscapes dataset](https://www.cityscapes-dataset.com/) as well as on images derived from the [CARLA simulator](https://carla.org/).
 The fog simulations generally work either by directly using a depth map that is available for each particular image, or by using the left and right images to calculate the depths in the images, thus reconstructing this depth map. This depth map helps in estimating how strongly the fog affects different parts of the image.
 
@@ -303,6 +398,8 @@ The following dataset was created entirely synthetically. The original images we
 
 ### Foggy KITTI from Uni Tübingen (?)
 tbd
+
+</details>
 
 ## Collected dataset
 
@@ -329,6 +426,23 @@ The cameras were used in spite of this issue because of their advantages in prog
 
 As just mentioned, the images show almost exclusively sunny scenes. This is due to them being collected during August, which is the clearest month of the year in Salt Lake City, with [the sky being clear around 78% of the time](https://weatherspark.com/y/2706/Average-Weather-in-Salt-Lake-City-Utah-United-States-Year-Round). The few times it was raining, the camera was not used to avoid damage to the electronics.
 
+
+# Licensing & Citation
+
+The dataset is licensed under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
+
+-> or should this be CC-BY-NC (non-commercial?)
+
+If you use the dataset or any of the code in this repository created by us, please cite the following paper:
+
+```
+@article{TEST,
+  title={Stereofog: ...},
+  author={...},
+  journal={...},
+  year={2023}
+}
+```
 
 # References
 
