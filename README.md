@@ -1,4 +1,10 @@
-# stereofog
+# stereofog - PAPER NAME ![visitors](https://visitor-badge.glitch.me/badge?page_id=apoll2000.stereofog&left_color=green&right_color=red)
+Github io page link | Arxiv/paper link | ...
+
+## News
+Test
+
+---
 
 <p align="center">
 <img src="images/stereofog_logo.png" alt="OpenMV H7 camera" width="275"/>
@@ -9,6 +15,8 @@
 </p>
 
 This repository documents a research project carried out at the [Laboratory for Optical Nanotechnologies](https://nanoptics.wordpress.com) at the University of Utah under supervision of [Prof. Rajesh Menon](https://faculty.utah.edu/u0676529-Rajesh_Menon/research/index.hml) in Summer (July-September) 2023. It was funded as part of the [RISE program](https://www.daad.de/rise/en/) by the [German Academic Exchange Service (Deutscher Akademischer Austauschdienst (DAAD))](https://en.wikipedia.org/wiki/German_Academic_Exchange_Service).
+
+> Disclaimer: This work was supported by a fellowship of the German Academic Exchange Service (DAAD).
 
 *potentially add some cool gifs here*
 *insert preliminary results, logos, images, etc. as teaser here*
@@ -232,11 +240,32 @@ The case was designed in [Fusion 360](https://www.autodesk.com/products/fusion-3
 <figcaption align = "center"><b>Rear view of entire CAD design</b></figcaption>
 </p>
 
-### Bill of Materials
+### Bill of Materials (BoM)
 The following components are required for the device:
 
+#### Purchased Parts
 - 2x [OpenMV H7 camera](https://openmv.io/collections/products/products/openmv-cam-h7)
-- ...
+- 1x [Adafruit Feather board](https://www.adafruit.com/product/3458) (or any other microcontroller capable of this task, i.e., any other microcontroller)
+- 1x [Hohem iSteady Q](https://store.hohem.com/products/isteady-q) gimbal
+- 2x Toggle switch (any latching switch that can be used to trigger the cameras)
+- 1x Breadboard 30x70mm
+- 2x Rubber stoppers
+
+#### Manufactured parts
+- Back box
+- Front plate
+- Front camera screw terminal
+- Gimbal mount
+- Gimbal bridge
+- Hinge
+- Lock body
+- Lock catch
+- Lock receptor
+- Maintenance door with hinge
+- Maintenance door brace
+- Rear camera standoff
+- Top plate
+- Wire restraint
 
 ### CAD file attributions
 
@@ -385,7 +414,7 @@ The fog simulations generally work either by directly using a depth map that is 
 The datasets in the following are semi-synthetic, meaning that they work with real images, to which the fog has been added synthetically. A disadvantage of this method is that the depth map is never perfect, which can lead to artifacts in the fogged images.
 
 #### Foggy Cityscapes from Uni Tübingen
-In cooperation with the researchers [Georg Volk](https://www.embedded.uni-tuebingen.de/en/team/georg-volk/) and  for the University of Tübingen, Germany, we trained a model on synthetic data generated for their paper ["Simulating Photo-realistic Snow and Fog on Existing Images for Enhanced CNN Training and Evaluation"](https://embedded.uni-tuebingen.de/assets/publications/vonBernuth-Volk-Bringmann_Snow_Fog.pdf).
+In cooperation with the researchers [Georg Volk](https://www.embedded.uni-tuebingen.de/en/team/georg-volk/) and [Jörg Gamerdinger](https://embedded.uni-tuebingen.de/en/team/joerg-gamerdinger/) from the University of Tübingen, Germany, we trained a model on synthetic data generated for their paper ["Simulating Photo-realistic Snow and Fog on Existing Images for Enhanced CNN Training and Evaluation"](https://embedded.uni-tuebingen.de/assets/publications/vonBernuth-Volk-Bringmann_Snow_Fog.pdf).
 
 #### Foggy Cityscapes from ETH Zürich
 Another dataset taken into consideration was the [Foggy Cityscapes dataset](http://people.ee.ethz.ch/~csakarid/SFSU_synthetic/) from the paper ["Semantic Foggy Scene Understanding with Synthetic Data"](http://people.ee.ethz.ch/~csakarid/SFSU_synthetic/Semantic_foggy_scene_understanding_with_synthetic_data-Sakaridis+Dai+Van_Gool-IJCV-AAM.pdf) by [Sakaridis et al.](https://people.ee.ethz.ch/~csakarid/). The dataset was created by the [Computer Vision Lab](https://www.vision.ee.ethz.ch/en/) of ETH Zürich, Switzerland.
@@ -429,9 +458,20 @@ As just mentioned, the images show almost exclusively sunny scenes. This is due 
 
 # Licensing & Citation
 
-The dataset is licensed under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
+## Code
+The code is licensed under the [BSD 3-Clause License](https://opensource.org/licenses/BSD-3-Clause), available under [CODE_LICENSE](CODE_LICENSE.txt).
+-> this is taken from pyramid pix2pix
+
+The parts of the code that were adopted from the pix2pix project are licensed under ... MAKE SURE NOT TO VIOLATE PIX2PIX BSD LICENSE HERE
+
+## Dataset
+The dataset is licensed under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/), available under [DATASET_LICENSE](DATASET_LICENSE.txt).
 
 -> or should this be CC-BY-NC (non-commercial?)
+
+## Hardware
+The hardware is licensed under the [CERN Open HArdware License v2 - Weakly Reciprocal (CERN-OHL-W v2)](https://ohwr.org/project/cernohl/wikis/Documents/CERN-OHL-version-2), available under [HARDWARE_LICENSE](HARDWARE_LICENSE.txt).
+
 
 If you use the dataset or any of the code in this repository created by us, please cite the following paper:
 
