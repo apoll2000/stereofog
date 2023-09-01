@@ -61,8 +61,8 @@ height_per_image = width_per_image / ratio
 if flip:
     fig, ax = plt.subplots(limit, num_models+2, figsize=(width_per_image*(num_models+2), height_per_image*limit))
 
-    ax[0, 0].text(0.5,1.1, 'fogged', transform=ax[0, 1].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k')
-    ax[0, 1].text(0.5,1.1, 'original', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k')
+    ax[0, 0].text(0.5,1.1, 'fogged', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k')
+    ax[0, 1].text(0.5,1.1, 'original', transform=ax[0, 1].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k')
 
     for i in range(limit):
 
@@ -87,8 +87,8 @@ if flip:
 else:
     fig, ax = plt.subplots(num_models+2, limit, figsize=(limit*width_per_image,(num_models+2)*height_per_image)) # num_models+2 to acommodate ground truth and fogged image
 
-    ax[0, 0].text(-0.1,0.5, 'fogged', transform=ax[1, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
-    ax[1, 0].text(-0.1,0.5, 'original', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
+    ax[0, 0].text(-0.1,0.5, 'fogged', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
+    ax[1, 0].text(-0.1,0.5, 'original', transform=ax[1, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
 
     for i in range(limit):
 

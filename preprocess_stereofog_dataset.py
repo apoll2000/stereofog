@@ -1,7 +1,6 @@
 import shutil
 import os
 import random
-import cv2
 import numpy as np
 import argparse
 import subprocess
@@ -13,7 +12,7 @@ parser.add_argument('--dataroot', required=True, help='path to images (should ha
 path = parser.parse_args().dataroot
 
 ## Moving all subsets of dataset into one folder
-folders = [item for item in os.listdir(path)]
+folders = [item for item in os.listdir(path) if item[0] != '.' and item != 'A' and item != 'B']
 
 for folder in folders:
     for subfolder in ['A', 'B']:
