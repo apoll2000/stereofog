@@ -167,6 +167,7 @@ results
 backup
 checkpoints
 docs
+slurm*.*
 
 # Random user-defined files
 Utah_Utes_-_U_logo.png
