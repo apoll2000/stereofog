@@ -28,7 +28,7 @@ commands = []
 for netD in netD_architectures:
     commands.append(
         f"python train.py --dataroot {dataroot} --name hyperparameter_netD_{netD} --model pix2pix "
-        f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --netD {netD} --checkpoints_dir {checkpoints_dir}"
+        f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --netD {netD} --checkpoints_dir {checkpoints_dir} --display_id 0"
     )
 
 # Run the commands

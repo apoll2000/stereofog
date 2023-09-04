@@ -27,13 +27,13 @@ commands = []
 for netG in netG_archictectures:
     commands.append(
         f"python train.py --dataroot {dataroot} --name hyperparameter_netG_{netG} --model pix2pix "
-        f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --netG {netG} --checkpoints_dir {checkpoints_dir}"
+        f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --netG {netG} --checkpoints_dir {checkpoints_dir} --display_id 0"
     )
 
-# # Run the commands
-# for command in commands:
-#     print("Running command:", command)
-#     subprocess.call(command, shell=True)
+# Run the commands
+for command in commands:
+    print("Running command:", command)
+    subprocess.call(command, shell=True)
 
 # Testing script
 test_script = []

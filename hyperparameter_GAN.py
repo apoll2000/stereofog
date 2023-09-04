@@ -15,7 +15,7 @@ n_epochs = args.n_epochs
 n_epochs_decay = args.n_epochs_decay
 num_test = args.num_test
 
-checkpoints_dir = "checkpoints/hyperparameters/hyperparameter_GAN_mode"
+checkpoints_dir = "checkpoints/hyperparameters/hyperparameter_GAN"
 
 # List of GAN modes to test
 GAN_modes = ["vanilla", "lsgan", "wgangp"]
@@ -26,7 +26,7 @@ commands = []
 # Generate the commands
 for GAN_mode in GAN_modes:
     commands.append(
-        f"python train.py --dataroot {dataroot} --name hyperparameter_GAN_mode_{GAN_mode} --model pix2pix "
+        f"python train.py --dataroot {dataroot} --name hyperparameter_GAN_{GAN_mode} --model pix2pix "
         f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --gan_mode {GAN_mode} --checkpoints_dir {checkpoints_dir}"
     )
 
@@ -41,8 +41,8 @@ test_script = []
 # Generate the test commands
 for GAN_mode in GAN_modes:
     test_script.append(
-        f"python test.py --dataroot {dataroot} --name hyperparameter_GAN_mode_{GAN_mode} --model pix2pix "
-        f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_GAN_mode'} --checkpoints_dir {checkpoints_dir}"
+        f"python test.py --dataroot {dataroot} --name hyperparameter_GAN_{GAN_mode} --model pix2pix "
+        f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_GAN'} --checkpoints_dir {checkpoints_dir}"
     )
 
 # Run the test commands

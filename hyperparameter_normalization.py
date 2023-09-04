@@ -16,6 +16,8 @@ n_epochs = args.n_epochs
 n_epochs_decay = args.n_epochs_decay
 num_test = args.num_test
 
+checkpoints_dir = "checkpoints/hyperparameters/hyperparameter_norm"
+
 # List of normalization layers to test
 norm_layers = ["batch", "instance", "none"]
 
@@ -26,7 +28,7 @@ commands = []
 for norm in norm_layers:
     commands.append(
         f"python train.py --dataroot {dataroot} --name hyperparameter_norm_{norm} --model pix2pix "
-        f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --norm {norm}"
+        f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --norm {norm} --checkpoints_dir {checkpoints_dir} --display_id 0"
     )
 
 # Run the commands
@@ -41,7 +43,7 @@ test_script = []
 for norm in norm_layers:
     test_script.append(
         f"python test.py --dataroot {dataroot} --name hyperparameter_norm_{norm} --model pix2pix "
-        f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_norm_{norm}'}"
+        f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_norm'} --norm {norm} --checkpoints_dir {checkpoints_dir}"
     )
 
 # Run the test commands
