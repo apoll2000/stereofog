@@ -2,8 +2,8 @@ import argparse
 import os
 from util import util
 import torch
-import models
-import data
+import models_Pyramidpix2pix as models
+import data_Pyramidpix2pix as data
 
 
 class BaseOptions():

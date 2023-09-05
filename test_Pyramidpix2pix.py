@@ -27,11 +27,11 @@ See training and test tips at: https://github.com/junyanz/pytorch-CycleGAN-and-p
 See frequently asked questions at: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/docs/qa.md
 """
 import os
-from options.test_options import TestOptions
+from options_Pyramidpix2pix.test_options import TestOptions
 from data import create_dataset
-from models import create_model
-from util.visualizer import save_images
-from util import html
+from models_Pyramidpix2pix import create_model
+from util_Pyramidpix2pix.visualizer import save_images
+from util_Pyramidpix2pix import html
 
 
 if __name__ == '__main__':

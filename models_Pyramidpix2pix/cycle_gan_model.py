@@ -1,6 +1,6 @@
 import torch
 import itertools
-from util.image_pool import ImagePool
+from util_Pyramidpix2pix.image_pool import ImagePool
 from .base_model import BaseModel
 from . import networks
 
