@@ -58,7 +58,7 @@ for folder in ['/A', '/B']:
 			
 
 
-combination_command = "python datasets/combine_A_and_B.py --fold_A {path}/A --fold_B {path}/B --fold_AB {path}"
+combination_command = f"python datasets/combine_A_and_B.py --fold_A {path}/A --fold_B {path}/B --fold_AB {path} --no_multiprocessing"
 
 subprocess.call(combination_command, shell=True)
 
