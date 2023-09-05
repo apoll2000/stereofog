@@ -15,11 +15,11 @@ import os
 
 # Plotting-specific commands to enhance the plots
 # Importing the color palettes
-with open('colors/thesis_specific_colors.json') as json_file:
-    specific_colors = json.load(json_file)
+# with open('colors/thesis_specific_colors.json') as json_file:
+#     specific_colors = json.load(json_file)
 
-with open("colors/thesis_color_palette.json", "r") as fp:
-    thesis_color_palette = json.load(fp)
+# with open("colors/color_palette.json", "r") as fp:
+#     color_palette = json.load(fp)
 deep_colors = sns.color_palette('deep')
 pastel_colors = sns.color_palette('pastel')
 
