@@ -168,6 +168,12 @@ backup
 checkpoints
 docs
 slurm*.*
+plots
+*.bmp
+*.png
+*.jpg
+*.jpeg
+*.drawio
 
 # Random user-defined files
 Utah_Utes_-_U_logo.png
