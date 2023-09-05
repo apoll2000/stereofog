@@ -4,6 +4,7 @@ import argparse
 import os
 import random
 import matplotlib.pyplot as plt
+from utils_stereofog import calculate_model_results
 
 parser = argparse.ArgumentParser()
 
@@ -35,7 +36,6 @@ images = [item for item in os.listdir(os.path.join(results_path, subfolders[0], 
 if shuffle:
     random.shuffle(images)
 
-
 try:
     images_to_plot = images[:num_images]
 
@@ -57,6 +57,17 @@ height_per_image = width_per_image / ratio
 # ax[0].text(0.5, 1.05, 'fake', fontsize=15, color='k', fontweight='black', ha='center', transform=ax[0].transAxes)
 # ax[1].text(0.5, 1.05, 'foggy real', fontsize=15, color='k', fontweight='black', ha='center', transform=ax[1].transAxes)
 # ax[2].text(0.5, 1.05, 'clear real', fontsize=15, color='k', fontweight='black', ha='center', transform=ax[2].transAxes)
+
+# Calculating SSIM and CW-SSIM scores for each model
+SSIM_scores = []
+CW_SSIM_scores = []
+Pearson_image_correlations = []
+
+for model_index, model in enumerate(models):
+    mean_SSIM, mean_CW_SSIM = calculate_model_results(os.path.join(results_path, subfolders[model_index]))
+    SSIM_scores.append(mean_SSIM)
+    CW_SSIM_scores.append(mean_CW_SSIM)
+
 
 if flip:
     fig, ax = plt.subplots(limit, num_models+2, figsize=(width_per_image*(num_models+2), height_per_image*limit))
@@ -81,8 +92,13 @@ if flip:
             img = plt.imread(os.path.join(results_path, subfolders[j], subpath_addition, images_to_plot[i]))
             ax[i, j+2].imshow(img, aspect='auto')
             if i == 0:
-                ax[i, j+2].text(0.5,1.1, models[j], transform=ax[i, j+2].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k')
+                ax[i, j+2].text(0.5,1.25, models[j], transform=ax[i, j+2].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k')
             ax[i, j+2].axis('off')
+
+    # Plotting each model's scores
+    for j in range(num_models):
+        ax[0, j+2].text(0.5,1.1, f'SSIM:{SSIM_scores[j]:.2f}\nCW-SSIM:{CW_SSIM_scores[j]:.2f}', transform=ax[0, j+2].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=12, fontweight='black', color='k')
+
 
 else:
     fig, ax = plt.subplots(num_models+2, limit, figsize=(limit*width_per_image,(num_models+2)*height_per_image)) # num_models+2 to acommodate ground truth and fogged image
@@ -107,8 +123,12 @@ else:
             img = plt.imread(os.path.join(results_path, subfolders[j], subpath_addition, images_to_plot[i]))
             ax[j+2, i].imshow(img, aspect='auto')
             if i == 0:
-                ax[j+2, i].text(-0.1,0.5, models[j], transform=ax[j+2, i].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
+                ax[j+2, i].text(-0.25,0.5, models[j], transform=ax[j+2, i].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
             ax[j+2, i].axis('off')
+
+    # Plotting each model's scores
+    for j in range(num_models):
+        ax[j+2, 0].text(-0.1,0.5, f'SSIM:{SSIM_scores[j]:.2f}\nCW-SSIM:{CW_SSIM_scores[j]:.2f}', transform=ax[j+2, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=12, fontweight='black', color='k', rotation='vertical')
 
 plt.subplots_adjust(hspace=0, wspace=0)
 plt.savefig(os.path.join(f"{results_path}", f"{hyperparameter}_evaluation.png"), bbox_inches='tight', pad_inches=0)
