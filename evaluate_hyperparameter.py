@@ -92,12 +92,12 @@ if flip:
             img = plt.imread(os.path.join(results_path, subfolders[j], subpath_addition, images_to_plot[i]))
             ax[i, j+2].imshow(img, aspect='auto')
             if i == 0:
-                ax[i, j+2].text(0.5,1.25, models[j], transform=ax[i, j+2].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k')
+                ax[i, j+2].text(0.5,1.3, models[j], transform=ax[i, j+2].transAxes, horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', zorder=20)
             ax[i, j+2].axis('off')
 
     # Plotting each model's scores
     for j in range(num_models):
-        ax[0, j+2].text(0.5,1.1, f'SSIM:{SSIM_scores[j]:.2f}\nCW-SSIM:{CW_SSIM_scores[j]:.2f}', transform=ax[0, j+2].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=12, fontweight='black', color='k')
+        ax[0, j+2].text(0.5,1.12, f'SSIM:{SSIM_scores[j]:.2f}\nCW-SSIM:{CW_SSIM_scores[j]:.2f}', transform=ax[0, j+2].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=12, fontweight='black', color='k')
 
 
 else:
@@ -132,39 +132,5 @@ else:
 
 plt.subplots_adjust(hspace=0, wspace=0)
 plt.savefig(os.path.join(f"{results_path}", f"{hyperparameter}_evaluation.png"), bbox_inches='tight', pad_inches=0)
-    # img1 = plt.imread(results_path + images[i])
-    # ax[3*i].imshow(img1, aspect='auto')
-    # ax[3*i].axis('off')
-    # plt.subplot(limit,3,2+3*i)
-    # plt.title('real_A')
-    
-    # ax[1+3*i].imshow(img2, aspect='auto')
 
-    # # Reading in the fogged image and calculating the variance of the Laplacian
-    # fogged_image_gray = cv2.cvtColor(cv2.imread(results_path + images[i][:-10] + 'real_A' + '.png'), cv2.COLOR_BGR2GRAY)
-    # fm = variance_of_laplacian(fogged_image_gray)
-
-    # ax[1+3*i].text(0.5,0.03, f'Laplace: {fm:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor=cm.jet(norm(fm)), horizontalalignment='center', verticalalignment='bottom', fontweight='black', color='k' if fm > center_fog_value_limit else 'w')
-    # ax[1+3*i].axis('off')
-    # # plt.subplot(limit,3,3+3*i)
-    # # plt.title('real_B')
-    # img3 = plt.imread(results_path + images[i][:-10] + 'real_B' + '.png')
-    # ax[2+3*i].imshow(img3, aspect='auto')
-    # ax[2+3*i].axis('off')
-
-    # # Reading in the clear image and calculating the SSIM to get a value for the fogginess (how much the fog changes the image) (https://stackoverflow.com/questions/71567315/how-to-get-the-ssim-comparison-score-between-two-images)
-    # clear_image_gray = cv2.cvtColor(cv2.imread(results_path + images[i][:-10] + 'real_B' + '.png'), cv2.COLOR_BGR2GRAY)
-
-    # (SSIM_score, SSIM_diff) = structural_similarity(img3, img2, full=True, multichannel=True)
-    # ax[1+3*i].text(0.02,0.91, f'SSIM: {SSIM_score:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='bottom', fontweight='black', color='k')
-
-    # # Calculating the Pearson correlation coefficient between the two images (https://stackoverflow.com/questions/34762661/percentage-difference-between-two-images-in-python-using-correlation-coefficient, https://mbrow20.github.io/mvbrow20.github.io/PearsonCorrelationPixelAnalysis.html)
-    # Pearson_image_correlation = np.corrcoef(np.asarray(fogged_image_gray), np.asarray(clear_image_gray))
-    # corrImAbs = np.absolute(Pearson_image_correlation)
-
-    # ax[1+3*i].text(0.98,0.91, f'Pearson: {np.mean(corrImAbs):.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='bottom', fontweight='black', color='k')
-
-
-# plt.figure(figsize=(15,10))
-
-# plt.tight_layout()
+print(f"Saved evaluation figure to {os.path.join(f'{results_path}', f'{hyperparameter}_evaluation.png')}.")
