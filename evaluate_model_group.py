@@ -12,21 +12,32 @@ parser.add_argument('--results_path', required=True, help='path to the results f
 parser.add_argument('--ratio', type=float, default=4/3, help='aspect ratio of the images (to undo the transformation from pix2pix model)')
 parser.add_argument('--num_images', type=int, default=5, help='number of images to plot for evaluation')
 parser.add_argument('--shuffle', action='store_true', help='if specified, shuffle the images before plotting')
+parser.add_argument('--seed', type=int, default=16, help='seed for the random shuffling of the images')
 parser.add_argument('--flip', action='store_true', help='if specified, make the rows correspond to different test images, not different models (i.e., rows and columns are flipped)')
 
 results_path = parser.parse_args().results_path
 ratio = parser.parse_args().ratio
 num_images = parser.parse_args().num_images
 shuffle = parser.parse_args().shuffle
+seed = parser.parse_args().seed
 flip = parser.parse_args().flip
 
-hyperparameter = results_path.split('/')[-1].replace('hyperparameter_', '')
+fontsize = 16
+
+if 'final_models' in results_path:
+    hyperparameter = 'final_models'
+else:
+    hyperparameter = results_path.split('/')[-1].replace('hyperparameter_', '')
 
 subfolders = [item for item in os.listdir(results_path) if os.path.isdir(os.path.join(results_path, item))]
 
 num_models = len(subfolders)
 
-models = [item.replace(results_path.split('/')[-1] + '_', '') for item in subfolders]
+if results_path.split('/')[-1].count('_') == 1:
+    models = [item.replace(results_path.split('/')[-1] + '_', '') for item in subfolders]
+else:
+    models = [item.replace('hyperparameter_', '') for item in subfolders]
+    sorted(models)
 
 # Part that needs to be inserted due to the way pix2pix saves the images
 subpath_addition = 'test_latest/images'
@@ -34,6 +45,7 @@ subpath_addition = 'test_latest/images'
 images = [item for item in os.listdir(os.path.join(results_path, subfolders[0], subpath_addition)) if 'fake_B' in item]
 
 if shuffle:
+    random.seed(seed)
     random.shuffle(images)
 
 try:
@@ -72,8 +84,8 @@ for model_index, model in enumerate(models):
 if flip:
     fig, ax = plt.subplots(limit, num_models+2, figsize=(width_per_image*(num_models+2), height_per_image*limit))
 
-    ax[0, 0].text(0.5,1.1, 'fogged', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k')
-    ax[0, 1].text(0.5,1.1, 'original', transform=ax[0, 1].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k')
+    ax[0, 0].text(0.5,1.1, 'fogged', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k')
+    ax[0, 1].text(0.5,1.1, 'original', transform=ax[0, 1].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k')
 
     for i in range(limit):
 
@@ -92,7 +104,7 @@ if flip:
             img = plt.imread(os.path.join(results_path, subfolders[j], subpath_addition, images_to_plot[i]))
             ax[i, j+2].imshow(img, aspect='auto')
             if i == 0:
-                ax[i, j+2].text(0.5,1.3, models[j], transform=ax[i, j+2].transAxes, horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', zorder=20)
+                ax[i, j+2].text(0.5,1.3, models[j], transform=ax[i, j+2].transAxes, horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k', zorder=20)
             ax[i, j+2].axis('off')
 
     # Plotting each model's scores
@@ -103,8 +115,8 @@ if flip:
 else:
     fig, ax = plt.subplots(num_models+2, limit, figsize=(limit*width_per_image,(num_models+2)*height_per_image)) # num_models+2 to acommodate ground truth and fogged image
 
-    ax[0, 0].text(-0.1,0.5, 'fogged', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
-    ax[1, 0].text(-0.1,0.5, 'original', transform=ax[1, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
+    ax[0, 0].text(-0.1,0.5, 'fogged', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k', rotation='vertical')
+    ax[1, 0].text(-0.1,0.5, 'original', transform=ax[1, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k', rotation='vertical')
 
     for i in range(limit):
 
@@ -123,7 +135,7 @@ else:
             img = plt.imread(os.path.join(results_path, subfolders[j], subpath_addition, images_to_plot[i]))
             ax[j+2, i].imshow(img, aspect='auto')
             if i == 0:
-                ax[j+2, i].text(-0.25,0.5, models[j], transform=ax[j+2, i].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=18, fontweight='black', color='k', rotation='vertical')
+                ax[j+2, i].text(-0.25,0.5, models[j], transform=ax[j+2, i].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k', rotation='vertical')
             ax[j+2, i].axis('off')
 
     # Plotting each model's scores
