@@ -14,6 +14,7 @@ from ssim.utils import get_gaussian_kernel
 from PIL import Image
 import cv2
 import re
+import torch.nn as nn # For the custom loss function
 
 # code for detecting the blurriness of an image (https://pyimagesearch.com/2015/09/07/blur-detection-with-opencv/)
 def variance_of_laplacian(image):
@@ -21,8 +22,35 @@ def variance_of_laplacian(image):
 	# measure, which is simply the variance of the Laplacian
 	return -cv2.Laplacian(image, cv2.CV_32F).var()
 
-def calculate_model_results(results_path, epoch='latest', epoch_test=False):
+# Code for calculating the MSE between two images (https://www.tutorialspoint.com/how-to-compare-two-images-in-opencv-python)
+def image_mse(img1, img2):
+   h, w = img1.shape
+   diff = cv2.subtract(img1, img2)
+   err = np.sum(diff**2)
+   mse = err/(float(h*w))
+   return mse
 
+# -- Normalized correlation coefficient (NCC) (https://xcdskd.readthedocs.io/en/latest/cross_correlation/cross_correlation_coefficient.html#Application-as-an-Image-Similarity-Measure)
+def norm_data(data):
+    """
+    normalize data to have mean=0 and standard_deviation=1
+    """
+    mean_data=np.mean(data)
+    std_data=np.std(data, ddof=1)
+    #return (data-mean_data)/(std_data*np.sqrt(data.size-1))
+    return (data-mean_data)/(std_data)
+
+def image_ncc(img1, img2):
+    """
+    normalized cross-correlation coefficient between two data sets
+
+    Parameters
+    ----------
+    img1, img2 :  numpy arrays of same size
+    """
+    return (1.0/(img1.size-1)) * np.sum(norm_data(img1)*norm_data(img2))
+
+def calculate_model_results(results_path, epoch='latest', epoch_test=False):
     if epoch_test:
 
         model_name = results_path.split('/')[-2].replace('_epochs', '')
@@ -39,9 +67,13 @@ def calculate_model_results(results_path, epoch='latest', epoch_test=False):
     # Indexing the images
     images = [entry for entry in os.listdir(results_path) if 'fake_B' in entry]
 
+    Pearson_image_correlations = []
+    MSE_scores = []
+    NCC_scores = []
     SSIM_scores = []
     CW_SSIM_scores = []
-    Pearson_image_correlations = []
+    
+
 
     for i, image in enumerate(images):
 
@@ -51,28 +83,37 @@ def calculate_model_results(results_path, epoch='latest', epoch_test=False):
         fake_image_nonfloat = cv2.imread(os.path.join(results_path, images[i]))
 
         # Calculating the Pearson correlation coefficient between the two images (https://stackoverflow.com/questions/34762661/percentage-difference-between-two-images-in-python-using-correlation-coefficient, https://mbrow20.github.io/mvbrow20.github.io/PearsonCorrelationPixelAnalysis.html)
-        # clear_image_gray = cv2.cvtColor(clear_image_nonfloat, cv2.COLOR_BGR2GRAY)
-        # Pearson_image_correlation = np.corrcoef(np.asarray(fogged_image_gray), np.asarray(clear_image_gray))
-        # corrImAbs = np.absolute(Pearson_image_correlation)
+        clear_image_gray = cv2.cvtColor(clear_image_nonfloat, cv2.COLOR_BGR2GRAY)
+        fake_image_gray = cv2.cvtColor(fake_image_nonfloat, cv2.COLOR_BGR2GRAY)
+        Pearson_image_correlation = np.corrcoef(np.asarray(fake_image_gray), np.asarray(clear_image_gray))
+        corrImAbs = np.absolute(Pearson_image_correlation)
 
-        # Pearson_image_correlations.append(np.mean(corrImAbs))
+        Pearson_image_correlations.append(np.mean(corrImAbs))
+
+        # Calculating the MSE between the two images
+        MSE_score = image_mse(clear_image_gray, fake_image_gray)
+        MSE_scores.append(MSE_score)
+
+        # Calculating the NCC between the two images
+        NCC_score = image_ncc(clear_image_gray, fake_image_gray)
+        NCC_scores.append(NCC_score)
 
         # Calculating the SSIM between the fake image and the clear image
         (SSIM_score_reconstruction, SSIM_diff_reconstruction) = structural_similarity(clear_image_nonfloat, fogged_image_nonfloat, full=True, multichannel=True, channel_axis=2)
-
         SSIM_scores.append(SSIM_score_reconstruction)
 
         # Calculating the CW-SSIM between the fake image and the clear image (https://github.com/jterrace/pyssim)
         CW_SSIM = SSIM(Image.open(os.path.join(results_path, images[i][:-10] + 'real_B' + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
-
         CW_SSIM_scores.append(CW_SSIM)
 
         # Calculate the average values
-
+        mean_Pearson = np.mean(Pearson_image_correlations)
+        mean_MSE = np.mean(MSE_scores)
+        mean_NCC = np.mean(NCC_scores)
         mean_SSIM = np.mean(SSIM_scores)
         mean_CW_SSIM = np.mean(CW_SSIM_scores)
 
-        return mean_SSIM, mean_CW_SSIM
+        return mean_Pearson, mean_MSE, mean_NCC, mean_SSIM, mean_CW_SSIM
     
 # Code source: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/issues/1161
 def generate_stats_from_log(experiment_name, line_interval=10, nb_data=10800, enforce_last_line=True, fig = None, ax = None, highlight_epoch=None):
@@ -122,3 +163,15 @@ def generate_stats_from_log(experiment_name, line_interval=10, nb_data=10800, en
         ax.scatter(highlight_epoch, dicts['D_fake'][highlight_epoch])
 
     return fig, ax
+
+
+class CW_SSIM(nn.Module):
+    def __init__(self):
+        super(CW_SSIM, self).__init__()
+
+
+
+    def forward(self, inputs, targets):
+        loss = SSIM(inputs).cw_ssim_value(targets)
+
+        return loss
