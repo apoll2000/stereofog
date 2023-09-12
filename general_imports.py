@@ -20,6 +20,8 @@ import os
 
 # with open("colors/color_palette.json", "r") as fp:
 #     color_palette = json.load(fp)
+color_palette = mpl.cycler(color=sns.color_palette("hls", 8))
+color_palette = color_palette.by_key()['color'] # Converting the cycler to a list
 deep_colors = sns.color_palette('deep')
 pastel_colors = sns.color_palette('pastel')
 
