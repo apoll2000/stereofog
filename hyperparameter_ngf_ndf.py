@@ -31,12 +31,12 @@ experiments = []
 # Test various widths of the U-Net (i.e., number of filters in the last conv layer)
 for ngf in n_gen_filters:
     experiments.append(f"python train.py --dataroot {dataroot} --name hyperparameter_ngf_{ngf} --model pix2pix "
-                       f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --ngf {ngf} --checkpoints_dir {checkpoints_dir}")
+                       f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --ngf {ngf} --results_dir {f'results/hyperparameters/hyperparameter_ngf_ndf'} --checkpoints_dir {checkpoints_dir}")
 
 # Test various depths of the U-Net (i.e., number of discrim filters in the first conv layer)
 for ndf in n_discrim_filters:
     experiments.append(f"python train.py --dataroot {dataroot} --name hyperparameter_ndf_{ndf} --model pix2pix "
-                       f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --ndf {ndf} --checkpoints_dir {checkpoints_dir}")
+                       f"--direction BtoA --n_epochs {n_epochs} --n_epochs_decay {n_epochs_decay} --ndf {ndf} --results_dir {f'results/hyperparameters/hyperparameter_ngf_ndf'} --checkpoints_dir {checkpoints_dir}")
 
 
 # Loop through experiments and execute each one sequentially
