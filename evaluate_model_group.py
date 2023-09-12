@@ -71,14 +71,26 @@ height_per_image = width_per_image / ratio
 # ax[2].text(0.5, 1.05, 'clear real', fontsize=15, color='k', fontweight='black', ha='center', transform=ax[2].transAxes)
 
 # Calculating SSIM and CW-SSIM scores for each model
+Pearson_correlation_scores = []
+MSE_scores = []
+NCC_scores = []
 SSIM_scores = []
 CW_SSIM_scores = []
-Pearson_image_correlations = []
 
 for model_index, model in enumerate(models):
-    mean_SSIM, mean_CW_SSIM = calculate_model_results(os.path.join(results_path, subfolders[model_index]))
+    mean_Pearson, mean_MSE, mean_NCC, mean_SSIM, mean_CW_SSIM = calculate_model_results(os.path.join(results_path, subfolders[model_index]))
+    Pearson_correlation_scores.append(mean_Pearson)
+    MSE_scores.append(mean_MSE)
+    NCC_scores.append(mean_NCC)
     SSIM_scores.append(mean_SSIM)
     CW_SSIM_scores.append(mean_CW_SSIM)
+
+scores = {  'Pearson': Pearson_correlation_scores,
+            'MSE': MSE_scores,
+            'NCC': NCC_scores,
+            'SSIM': SSIM_scores,
+            'CW-SSIM': CW_SSIM_scores
+          }
 
 
 if flip:
@@ -104,19 +116,21 @@ if flip:
             img = plt.imread(os.path.join(results_path, subfolders[j], subpath_addition, images_to_plot[i]))
             ax[i, j+2].imshow(img, aspect='auto')
             if i == 0:
-                ax[i, j+2].text(0.5,1.3, models[j], transform=ax[i, j+2].transAxes, horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k', zorder=20)
+                ax[i, j+2].text(0.5,1.1, models[j], transform=ax[i, j+2].transAxes, horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k', zorder=20)
             ax[i, j+2].axis('off')
 
     # Plotting each model's scores
+    score_plot_distance = 0.1
     for j in range(num_models):
-        ax[0, j+2].text(0.5,1.12, f'SSIM:{SSIM_scores[j]:.2f}\nCW-SSIM:{CW_SSIM_scores[j]:.2f}', transform=ax[0, j+2].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=12, fontweight='black', color='k')
+        for score_index, score in enumerate(scores.keys()):
+            ax[0, j+2].text(0.5,1.2 + score_plot_distance*score_index, f'{score}: {scores[score][j]:.2f}', transform=ax[0, j+2].transAxes, horizontalalignment='center', verticalalignment='center', fontsize=12, fontweight='black', color='k')
 
 
 else:
     fig, ax = plt.subplots(num_models+2, limit, figsize=(limit*width_per_image,(num_models+2)*height_per_image)) # num_models+2 to acommodate ground truth and fogged image
 
-    ax[0, 0].text(-0.1,0.5, 'fogged', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k', rotation='vertical')
-    ax[1, 0].text(-0.1,0.5, 'original', transform=ax[1, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k', rotation='vertical')
+    ax[0, 0].text(-0.07,0.5, 'fogged', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k', rotation='vertical')
+    ax[1, 0].text(-0.07,0.5, 'original', transform=ax[1, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k', rotation='vertical')
 
     for i in range(limit):
 
@@ -135,12 +149,16 @@ else:
             img = plt.imread(os.path.join(results_path, subfolders[j], subpath_addition, images_to_plot[i]))
             ax[j+2, i].imshow(img, aspect='auto')
             if i == 0:
-                ax[j+2, i].text(-0.25,0.5, models[j], transform=ax[j+2, i].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k', rotation='vertical')
+                ax[j+2, i].text(-0.07,0.5, models[j], transform=ax[j+2, i].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k', rotation='vertical', zorder=20)
             ax[j+2, i].axis('off')
 
     # Plotting each model's scores
+    score_plot_distance = 0.1
     for j in range(num_models):
-        ax[j+2, 0].text(-0.1,0.5, f'SSIM:{SSIM_scores[j]:.2f}\nCW-SSIM:{CW_SSIM_scores[j]:.2f}', transform=ax[j+2, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=12, fontweight='black', color='k', rotation='vertical')
+        for score_index, score in enumerate(scores.keys()):
+            ax[j+2, 0].text(-0.15 - score_plot_distance*score_index,0.5, f'{score}: {scores[score][j]:.2f}', transform=ax[j+2, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=12, fontweight='black', color='k', rotation='vertical')
+    # for j in range(num_models):
+    #     ax[j+2, 0].text(-0.1,0.5, f'SSIM:{SSIM_scores[j]:.2f}\nCW-SSIM:{CW_SSIM_scores[j]:.2f}', transform=ax[j+2, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=12, fontweight='black', color='k', rotation='vertical')
 
 plt.subplots_adjust(hspace=0, wspace=0)
 plt.savefig(os.path.join(f"{results_path}", f"{hyperparameter}_evaluation.png"), bbox_inches='tight', pad_inches=0)
