@@ -40,7 +40,7 @@ for command in commands:
 test_script = []
 
 # Generate the test commands
-for netD in netD_architectures:
+for lr_policy in lr_policies:
     test_script.append(
         f"python test.py --dataroot {dataroot} --name hyperparameter_lr_policy_{lr_policy} --model pix2pix "
         f"--direction BtoA --num_test {num_test} --epoch latest --results_dir {f'results/hyperparameters/hyperparameter_lr_policy'} --checkpoints_dir {checkpoints_dir}"
@@ -51,4 +51,4 @@ for command in test_script:
     print("Running command:", command)
     subprocess.call(command, shell=True)
 
-print("All hyperparameter tests for netD mode completed.")
+print("All hyperparameter tests for learning rate policy completed.")
