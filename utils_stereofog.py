@@ -15,6 +15,9 @@ from PIL import Image
 import cv2
 import re
 import torch.nn as nn # For the custom loss function
+from torch import squeeze
+from PIL import Image
+import torchvision.transforms as T
 
 # code for detecting the blurriness of an image (https://pyimagesearch.com/2015/09/07/blur-detection-with-opencv/)
 def variance_of_laplacian(image):
@@ -165,6 +168,8 @@ def generate_stats_from_log(experiment_name, line_interval=10, nb_data=10800, en
     return fig, ax
 
 
+image_transform = T.ToPILImage()
+
 class CW_SSIM(nn.Module):
     def __init__(self):
         super(CW_SSIM, self).__init__()
@@ -172,6 +177,7 @@ class CW_SSIM(nn.Module):
 
 
     def forward(self, inputs, targets):
-        loss = SSIM(inputs).cw_ssim_value(targets)
+        # print('Shapes:', inputs.min(), inputs.max())
+        loss = SSIM(image_transform(squeeze(inputs))).cw_ssim_value(image_transform(squeeze(targets)))
 
         return loss
