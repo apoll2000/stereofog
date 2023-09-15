@@ -13,7 +13,7 @@ parser.add_argument('--ratio', type=float, default=4/3, help='aspect ratio of th
 parser.add_argument('--num_images', type=int, default=5, help='number of images to plot for evaluation')
 parser.add_argument('--shuffle', action='store_true', help='if specified, shuffle the images before plotting')
 parser.add_argument('--seed', type=int, default=16, help='seed for the random shuffling of the images')
-parser.add_argument('--flip', action='store_true', help='if specified, make the rows correspond to different test images, not different models (i.e., rows and columns are flipped)')
+parser.add_argument('--flip', action='store_true', help='if specified, make the columns correspond to different test images, not different models (i.e., rows and columns are flipped)')
 
 results_path = parser.parse_args().results_path
 ratio = parser.parse_args().ratio
@@ -35,9 +35,10 @@ num_models = len(subfolders)
 
 if results_path.split('/')[-1].count('_') == 1:
     models = [item.replace(results_path.split('/')[-1] + '_', '') for item in subfolders]
+    models = sorted(models)
 else:
     models = [item.replace('hyperparameter_', '') for item in subfolders]
-    sorted(models)
+    models = sorted(models)
 
 # Part that needs to be inserted due to the way pix2pix saves the images
 subpath_addition = 'test_latest/images'
@@ -93,7 +94,7 @@ scores = {  'Pearson': Pearson_correlation_scores,
           }
 
 
-if flip:
+if not flip:
     fig, ax = plt.subplots(limit, num_models+2, figsize=(width_per_image*(num_models+2), height_per_image*limit))
 
     ax[0, 0].text(0.5,1.1, 'fogged', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k')

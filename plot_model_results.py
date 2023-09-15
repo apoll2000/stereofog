@@ -126,6 +126,8 @@ m = np.zeros((1,200))
 for i in range(200):
     m[0,i] = (i)/200.0
 
+plt.subplots_adjust(hspace=0, wspace=0)
+
 ax = subfigs[1].add_subplot(1, 1, 1)
 
 plt.imshow(m, cmap='jet', aspect = 2)
@@ -140,3 +142,4 @@ for coordinate, text, ha in zip([0, 100, 200], ['low fog', 'medium fog', 'high f
 superfig.tight_layout()
 
 plt.savefig(os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation.png"), bbox_inches='tight')
+print("Saved the evaluation plot to", os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation.png."))
