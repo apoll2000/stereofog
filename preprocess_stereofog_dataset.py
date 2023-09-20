@@ -78,10 +78,8 @@ if augment:
 	# Adding the ground truth data to be transformed
 	p.ground_truth(os.path.join(path, 'A/train'))
 	# Adding operations to the pipeline
-	p.rotate(probability=1, max_left_rotation=5, max_right_rotation=5)
-	p.flip_left_right(probability=0.5)
-	p.zoom_random(probability=0.5, percentage_area=0.8)
-	p.flip_top_bottom(probability=0.5)
+	p.flip_left_right(probability=1)
+	p.zoom_random(probability=0.3, percentage_area=0.8)
 	p.process() # Transforming each image exactly once
 
 	# Moving the generated images out of the output folder to rejoin them with the original images
