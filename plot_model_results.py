@@ -21,6 +21,7 @@ parser.add_argument('--num_images', type=int, default=5, help='number of images 
 parser.add_argument('--shuffle', action='store_true', help='if specified, shuffle the images before plotting')
 parser.add_argument('--seed', type=int, default=16, help='seed for the random shuffling of the images')
 parser.add_argument('--ratio', type=float, default=4/3, help='aspect ratio of the images (to undo the transformation from pix2pix model)')
+parser.add_argument('--no_laplace', action='store_true', help='if specified, do not plot the Laplacian variance on the fogged images')
 
 args = parser.parse_args()
 
@@ -29,6 +30,7 @@ num_images = args.num_images
 shuffle = args.shuffle
 seed = args.seed
 ratio = args.ratio
+no_laplace = args.no_laplace
 
 original_results_path = results_path
 results_path = os.path.join(results_path, 'test_latest/images')
@@ -56,14 +58,26 @@ if shuffle:
 width_per_image = 4
 height_per_image = width_per_image / ratio
 
-# Creating the overarching figure containing the images and the colormap (from here: https://stackoverflow.com/questions/34933905/adding-subplots-to-a-subplot)
-superfig = plt.figure(figsize=(3*width_per_image,((num_images + 0.1)*height_per_image)))
 
-# Creating the subfigures for the images and the colormap
-subfigs = superfig.subfigures(2, 1, height_ratios=[num_images, 0.1*num_images])
+if not no_laplace:
+    # Creating the overarching figure containing the images and the colormap (from here: https://stackoverflow.com/questions/34933905/adding-subplots-to-a-subplot)
+    superfig = plt.figure(figsize=(3*width_per_image,((num_images + 0.1)*height_per_image)))
 
-# Creating the subplots for the images
-ax = [subfigs[0].add_subplot(num_images,3,i+1) for i in range(num_images*3)]
+    # Creating the subfigures for the images and the colormap
+    subfigs = superfig.subfigures(2, 1, height_ratios=[num_images, 0.1*num_images])
+
+    # Creating the subplots for the images
+    ax = [subfigs[0].add_subplot(num_images,3,i+1) for i in range(num_images*3)]
+
+else:
+    # Creating the overarching figure containing the images and the colormap (from here: https://stackoverflow.com/questions/34933905/adding-subplots-to-a-subplot)
+    superfig = plt.figure(figsize=(3*width_per_image,((num_images)*height_per_image)))
+
+    # Creating the subfigures for the images and the colormap
+    subfigs = superfig.subfigures(1, 1)#, height_ratios=[num_images, 0.1*num_images])
+
+    # Creating the subplots for the images
+    ax = [subfigs.add_subplot(num_images,3,i+1) for i in range(num_images*3)]
 
 # Setting the titles for the images
 ax[0].text(0.5, 1.05, 'fake', fontsize=15, color='k', fontweight='black', ha='center', transform=ax[0].transAxes)
@@ -82,9 +96,12 @@ for i in range(num_images):
 
     # Reading in the fogged image again and calculating the variance of the Laplacian
     fogged_image_gray = cv2.cvtColor(cv2.imread(os.path.join(results_path, images[i][:-10] + 'real_A' + '.png')), cv2.COLOR_BGR2GRAY)
-    fm = variance_of_laplacian(fogged_image_gray)
-    # Putting the value of the variance of the Laplacian on the image
-    ax[1+3*i].text(0.5,0.03, f'Laplace: {fm:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor=cm.jet(norm(fm)), horizontalalignment='center', verticalalignment='bottom', fontweight='black', color='k' if fm > center_fog_value_limit else 'w')
+    
+    if not no_laplace:
+        fm = variance_of_laplacian(fogged_image_gray)
+        # Putting the value of the variance of the Laplacian on the image
+        ax[1+3*i].text(0.5,0.03, f'Laplace: {fm:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor=cm.jet(norm(fm)), horizontalalignment='center', verticalalignment='bottom', fontweight='black', color='k' if fm > center_fog_value_limit else 'w')
+    
     ax[1+3*i].axis('off')
 
     # Reading in the clear image
@@ -120,26 +137,29 @@ for i in range(num_images):
 
 # plt.figure(figsize=(15,10))
 
+if not no_laplace:
+    # Plotting the colormap below (https://stackoverflow.com/questions/2451264/creating-a-colormap-legend-in-matplotlib)
+    m = np.zeros((1,200))
+    for i in range(200):
+        m[0,i] = (i)/200.0
 
-# Plotting the colormap below (https://stackoverflow.com/questions/2451264/creating-a-colormap-legend-in-matplotlib)
-m = np.zeros((1,200))
-for i in range(200):
-    m[0,i] = (i)/200.0
+    plt.subplots_adjust(hspace=0, wspace=0)
 
-plt.subplots_adjust(hspace=0, wspace=0)
+    ax = subfigs[1].add_subplot(1, 1, 1)
 
-ax = subfigs[1].add_subplot(1, 1, 1)
+    plt.imshow(m, cmap='jet', aspect = 2)
+    plt.yticks(np.arange(0))
 
-plt.imshow(m, cmap='jet', aspect = 2)
-plt.yticks(np.arange(0))
+    ax.axis('off')
 
-ax.axis('off')
+    # Adding labels to the colormap
+    for coordinate, text, ha in zip([0, 100, 200], ['low fog', 'medium fog', 'high fog'], ['left', 'center', 'right']):
+        plt.text(coordinate, -0.7, text, ha=ha, va='bottom', fontweight='black', color='k')
 
-# Adding labels to the colormap
-for coordinate, text, ha in zip([0, 100, 200], ['low fog', 'medium fog', 'high fog'], ['left', 'center', 'right']):
-    plt.text(coordinate, -0.7, text, ha=ha, va='bottom', fontweight='black', color='k')
+    superfig.tight_layout()
 
-superfig.tight_layout()
+else:
+    plt.subplots_adjust(hspace=0, wspace=0)
 
 plt.savefig(os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation.png"), bbox_inches='tight')
 print("Saved the evaluation plot to", os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation.png."))
