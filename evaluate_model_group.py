@@ -14,6 +14,7 @@ parser.add_argument('--num_images', type=int, default=5, help='number of images 
 parser.add_argument('--shuffle', action='store_true', help='if specified, shuffle the images before plotting')
 parser.add_argument('--seed', type=int, default=16, help='seed for the random shuffling of the images')
 parser.add_argument('--flip', action='store_true', help='if specified, make the columns correspond to different test images, not different models (i.e., rows and columns are flipped)')
+parser.add_argument('--epoch', type=int, default='latest', help='epoch to plot the results of')
 
 results_path = parser.parse_args().results_path
 ratio = parser.parse_args().ratio
@@ -21,6 +22,7 @@ num_images = parser.parse_args().num_images
 shuffle = parser.parse_args().shuffle
 seed = parser.parse_args().seed
 flip = parser.parse_args().flip
+epoch = parser.parse_args().epoch
 
 fontsize = 16
 
@@ -41,7 +43,7 @@ else:
     models = sorted(models)
 
 # Part that needs to be inserted due to the way pix2pix saves the images
-subpath_addition = 'test_latest/images'
+subpath_addition = f'test_{epoch}/images'
 
 images = [item for item in os.listdir(os.path.join(results_path, subfolders[0], subpath_addition)) if 'fake_B' in item]
 
@@ -79,7 +81,7 @@ SSIM_scores = []
 CW_SSIM_scores = []
 
 for model_index, model in enumerate(models):
-    mean_Pearson, mean_MSE, mean_NCC, mean_SSIM, mean_CW_SSIM = calculate_model_results(os.path.join(results_path, subfolders[model_index]))
+    mean_Pearson, mean_MSE, mean_NCC, mean_SSIM, mean_CW_SSIM = calculate_model_results(os.path.join(results_path, subfolders[model_index]), epoch=epoch)
     Pearson_correlation_scores.append(mean_Pearson)
     MSE_scores.append(mean_MSE)
     NCC_scores.append(mean_NCC)
