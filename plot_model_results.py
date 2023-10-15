@@ -20,8 +20,9 @@ parser.add_argument('--results_path', required=True, help='path to the results f
 parser.add_argument('--num_images', type=int, default=5, help='number of images to plot')
 parser.add_argument('--shuffle', action='store_true', help='if specified, shuffle the images before plotting')
 parser.add_argument('--seed', type=int, default=16, help='seed for the random shuffling of the images')
-parser.add_argument('--ratio', type=float, default=4/3, help='aspect ratio of the images (to undo the transformation from pix2pix model)')
+parser.add_argument('--ratio', default=4/3, help='aspect ratio of the images (to undo the transformation from pix2pix model)')
 parser.add_argument('--no_laplace', action='store_true', help='if specified, do not plot the Laplacian variance on the fogged images')
+parser.add_argument('--no_fog_colorbar', action='store_true', help='if specified, do not plot the fogginess colorbar below')
 
 args = parser.parse_args()
 
@@ -31,6 +32,16 @@ shuffle = args.shuffle
 seed = args.seed
 ratio = args.ratio
 no_laplace = args.no_laplace
+no_fog_colorbar = args.no_fog_colorbar
+
+if no_laplace:
+    no_fog_colorbar = True
+
+if type(ratio) != float:
+    try:
+        ratio = float(ratio.split('/')[0])/float(ratio.split('/')[1])
+    except:
+        raise ValueError('The ratio must be a float or a string of the form "x/y".')
 
 original_results_path = results_path
 results_path = os.path.join(results_path, 'test_latest/images')
@@ -59,7 +70,7 @@ width_per_image = 4
 height_per_image = width_per_image / ratio
 
 
-if not no_laplace:
+if not no_fog_colorbar:
     # Creating the overarching figure containing the images and the colormap (from here: https://stackoverflow.com/questions/34933905/adding-subplots-to-a-subplot)
     superfig = plt.figure(figsize=(3*width_per_image,((num_images + 0.1)*height_per_image)))
 
@@ -137,7 +148,7 @@ for i in range(num_images):
 
 # plt.figure(figsize=(15,10))
 
-if not no_laplace:
+if not no_fog_colorbar:
     # Plotting the colormap below (https://stackoverflow.com/questions/2451264/creating-a-colormap-legend-in-matplotlib)
     m = np.zeros((1,200))
     for i in range(200):
@@ -159,7 +170,8 @@ if not no_laplace:
     superfig.tight_layout()
 
 else:
-    plt.subplots_adjust(hspace=0, wspace=0)
+    # plt.subplots_adjust(hspace=0, wspace=0)
+    plt.tight_layout()
 
 plt.savefig(os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation.png"), bbox_inches='tight')
 print("Saved the evaluation plot to", os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation.png."))
