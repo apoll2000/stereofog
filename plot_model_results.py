@@ -1,5 +1,7 @@
 # Script for plotting the image results of the pix2pix model
 
+from general_imports import *
+
 import argparse
 import os
 import random
@@ -12,7 +14,11 @@ from skimage.metrics import structural_similarity
 from utils_stereofog import variance_of_laplacian
 from ssim import SSIM
 from ssim.utils import get_gaussian_kernel
+from pytorch_msssim import ms_ssim
 from PIL import Image
+import torch
+
+plt.rc('font', size=13)          # controls default text sizes
 
 parser = argparse.ArgumentParser()
 
@@ -91,9 +97,9 @@ else:
     ax = [subfigs.add_subplot(num_images,3,i+1) for i in range(num_images*3)]
 
 # Setting the titles for the images
-ax[0].text(0.5, 1.05, 'fake', fontsize=15, color='k', fontweight='black', ha='center', transform=ax[0].transAxes)
-ax[1].text(0.5, 1.05, 'foggy real', fontsize=15, color='k', fontweight='black', ha='center', transform=ax[1].transAxes)
-ax[2].text(0.5, 1.05, 'clear real', fontsize=15, color='k', fontweight='black', ha='center', transform=ax[2].transAxes)
+ax[0].text(0.5, 1.05, 'reconstructed', fontsize=19, color='k', fontweight='black', ha='center', transform=ax[0].transAxes)
+ax[1].text(0.5, 1.05, 'foggy real', fontsize=19, color='k', fontweight='black', ha='center', transform=ax[1].transAxes)
+ax[2].text(0.5, 1.05, 'ground truth', fontsize=19, color='k', fontweight='black', ha='center', transform=ax[2].transAxes)
 
 for i in range(num_images):
     # Reading in the fake image
@@ -146,6 +152,15 @@ for i in range(num_images):
     # Putting the value of the CW-SSIM on the fake image
     ax[3*i].text(1,1, f'CW-SSIM (r): {CW_SSIM:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k')
 
+    # Calculating the MS-SSIM between the fake image and the clear image
+    real_img = np.array(Image.open(os.path.join(results_path, images[i][:-10] + 'real_B' + '.png'))).astype(np.float32)
+    real_img = torch.from_numpy(real_img).unsqueeze(0).permute(0, 3, 1, 2)
+    fake_img = np.array(Image.open(os.path.join(results_path, images[i]))).astype(np.float32)
+    fake_img = torch.from_numpy(fake_img).unsqueeze(0).permute(0, 3, 1, 2)
+    MS_SSIM = ms_ssim(real_img, fake_img, data_range=255, size_average=True).item()
+    # Putting the value of the MS-SSIM on the fake image
+    ax[3*i].text(1,0, f'MS-SSIM (r): {MS_SSIM:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='bottom', fontweight='black', color='k')
+
 # plt.figure(figsize=(15,10))
 
 if not no_fog_colorbar:
@@ -165,7 +180,7 @@ if not no_fog_colorbar:
 
     # Adding labels to the colormap
     for coordinate, text, ha in zip([0, 100, 200], ['low fog', 'medium fog', 'high fog'], ['left', 'center', 'right']):
-        plt.text(coordinate, -0.7, text, ha=ha, va='bottom', fontweight='black', color='k')
+        plt.text(coordinate, -0.7, text, ha=ha, va='bottom', fontweight='black', color='k', fontsize=15)
 
     superfig.tight_layout()
 
@@ -173,5 +188,5 @@ else:
     # plt.subplots_adjust(hspace=0, wspace=0)
     plt.tight_layout()
 
-plt.savefig(os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation.png"), bbox_inches='tight')
-print("Saved the evaluation plot to", os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation.png."))
+plt.savefig(os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation.pdf"), format='pdf', bbox_inches='tight')
+print("Saved the evaluation plot to", os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation.pdf."))

@@ -11,13 +11,16 @@ import numpy as np
 from skimage.metrics import structural_similarity
 from ssim import SSIM
 from ssim.utils import get_gaussian_kernel
+from pytorch_msssim import ms_ssim
 from PIL import Image
 import cv2
 import re
+import torch
 import torch.nn as nn # For the custom loss function
 from torch import squeeze
 from PIL import Image
 import torchvision.transforms as T
+
 
 # code for detecting the blurriness of an image (https://pyimagesearch.com/2015/09/07/blur-detection-with-opencv/)
 def variance_of_laplacian(image):
@@ -75,8 +78,9 @@ def calculate_model_results(results_path, epoch='latest', epoch_test=False):
     NCC_scores = []
     SSIM_scores = []
     CW_SSIM_scores = []
+    MS_SSIM_scores = []
     
-
+    print('Calculating scores for model:', results_path.split('/')[-3])
 
     for i, image in enumerate(images):
 
@@ -109,14 +113,26 @@ def calculate_model_results(results_path, epoch='latest', epoch_test=False):
         CW_SSIM = SSIM(Image.open(os.path.join(results_path, images[i][:-10] + 'real_B' + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
         CW_SSIM_scores.append(CW_SSIM)
 
-        # Calculate the average values
-        mean_Pearson = np.mean(Pearson_image_correlations)
-        mean_MSE = np.mean(MSE_scores)
-        mean_NCC = np.mean(NCC_scores)
-        mean_SSIM = np.mean(SSIM_scores)
-        mean_CW_SSIM = np.mean(CW_SSIM_scores)
+        # Calculating the MS-SSIM between the fake image and the clear image
+        real_img = np.array(Image.open(os.path.join(results_path, images[i][:-10] + 'real_B' + '.png'))).astype(np.float32)
+        real_img = torch.from_numpy(real_img).unsqueeze(0).permute(0, 3, 1, 2)
+        fake_img = np.array(Image.open(os.path.join(results_path, images[i]))).astype(np.float32)
+        fake_img = torch.from_numpy(fake_img).unsqueeze(0).permute(0, 3, 1, 2)
+        MS_SSIM = ms_ssim(real_img, fake_img, data_range=255, size_average=True).item()
+        MS_SSIM_scores.append(MS_SSIM)
 
-        return mean_Pearson, mean_MSE, mean_NCC, mean_SSIM, mean_CW_SSIM
+        if i % 25 == 0:
+            print(f'Image {i} of {len(images)}')
+
+    # Calculate the average values
+    mean_Pearson = np.mean(Pearson_image_correlations)
+    mean_MSE = np.mean(MSE_scores)
+    mean_NCC = np.mean(NCC_scores)
+    mean_SSIM = np.mean(SSIM_scores)
+    mean_CW_SSIM = np.mean(CW_SSIM_scores)
+    mean_MS_SSIM = np.mean(MS_SSIM_scores)
+
+    return mean_Pearson, mean_MSE, mean_NCC, mean_SSIM, mean_CW_SSIM, mean_MS_SSIM
     
 # Code source: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/issues/1161
 def generate_stats_from_log(experiment_name, line_interval=10, nb_data=10800, enforce_last_line=True, fig = None, ax = None, highlight_epoch=None):
