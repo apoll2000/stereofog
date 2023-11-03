@@ -65,7 +65,7 @@ class Pix2PixMSSSIMModel(BaseModel):
             # define loss functions
             self.criterionGAN = networks.GANLoss(opt.gan_mode).to(self.device)
             # self.criterionL1 = torch.nn.L1Loss()
-            self.criterionL1 = MS_SSIM(win_size=11, win_sigma=1.5, data_range=1, size_average=True, channel=3) # MODIFICATION: Swapping L1 loss with SSIM
+            self.criterionL1 = MS_SSIM(win_size=11, win_sigma=1.5, data_range=1, size_average=True, channel=3) # MODIFICATION: Swapping L1 loss with MS-SSIM
             # initialize optimizers; schedulers will be automatically created by function <BaseModel.setup>.
             self.optimizer_G = torch.optim.Adam(self.netG.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
             self.optimizer_D = torch.optim.Adam(self.netD.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))

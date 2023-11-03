@@ -1,8 +1,8 @@
-# stereofog - PAPER NAME ![visitors](https://visitor-badge.glitch.me/badge?page_id=apoll2000.stereofog&left_color=green&right_color=red)
-Github io page link | Arxiv/paper link | ...
+# stereofog - PAPER NAME ![visitors](https://visitor-badge.glitch.me/badge?page_id=apoll2000.stereofog&left_color=green&right_color=red) ![Visitors](https://api.visitorbadge.io/api/visitors?path=apoll2000%2Fstereofog&countColor=%23263759)
+Github io page link | Arxiv/paper link | [<img src="https://www.edigitalagency.com.au/wp-content/uploads/YouTube-icon-red-png.png" height="16">](https://youtu.be/P8lyz_wZo2c) |...
 
 ## News
-Test
+nothing to show here (yet)
 
 ---
 
@@ -25,6 +25,11 @@ This repository documents a research project carried out at the [Laboratory for 
  fogged image  |  real image  |   synthetic image 
 :-------------------------:|:-------------------------:|:-------------------------:
 ![](images/01-04_08_23__736_B.bmp) |  ![](images/01-04_08_23__736_A.bmp) | ![](images/01-04_08_23__736_A.bmp)
+
+<p align="center">
+<img src="results/epochs/hyperparameter_GAN_vanilla_epochs_results/hyperparameter_GAN_vanilla_epochs_results.gif" alt="Adafruit Feather 32u4 Radio board" width="700"/>
+<figcaption align = "center"><b>Looping through the epochs of a trained model</b></figcaption>
+</p>
 
 
 ## Table of Contents
@@ -65,7 +70,7 @@ This project had three objectives:
 * Military
 
 ## Project timeline
-*Description of project timeline here*
+The project was carried out over the course three months, from July to September 2023. The following Gantt chart shows the project timeline:
 
 ![project timeline](images/gantt_chart_stereofog.png "project timeline")
 <figcaption align = "center"><b>Project timeline</b></figcaption>
@@ -286,8 +291,7 @@ DIN912 M3 25mm screw | [3Dfindit](https://www.3dfindit.com/en/digitaltwin/hexago
 
 ## Model Training
 
-The models were trained on a lab computer equipped with a dedicated GPU (NVIDIA GeForce GTX 970) and 64 GB of RAM.
-
+The models were either trained on a lab computer equipped with a dedicated GPU (NVIDIA GeForce GTX 970) and 64 GB of RAM or on the University of Utah's [Center for High Performance Computing (CHPC)](https://www.chpc.utah.edu) cluster.
 All models were trained for the default 200 epochs for the pix2pix model. The training time increased along with the size of the dataset. For the final model, the training time was around 20 hours.
 
 ## Getting started
@@ -422,11 +426,8 @@ Another dataset taken into consideration was the [Foggy Cityscapes dataset](http
 ### Fully synthetic datasets
 The following dataset was created entirely synthetically. The original images were rendered using a driving simulator, which generated the matching perfect depth maps as well. This way, the fogged images do not show any artifacts.
 
-#### Foggy Carla from Uni Tübingen
-
-
-### Foggy KITTI from Uni Tübingen (?)
-tbd
+#### Foggy CARLA from Uni Tübingen
+This dataset was created by the researchers [Georg Volk](https://www.embedded.uni-tuebingen.de/en/team/georg-volk/) and [Jörg Gamerdinger](https://embedded.uni-tuebingen.de/en/team/joerg-gamerdinger/) from the University of Tübingen, Germany, using the same technique from the paper ["Simulating Photo-realistic Snow and Fog on Existing Images for Enhanced CNN Training and Evaluation"](https://embedded.uni-tuebingen.de/assets/publications/vonBernuth-Volk-Bringmann_Snow_Fog.pdf). It is based on the [CARLA simulator](https://carla.org/).
 
 </details>
 
@@ -440,7 +441,7 @@ tbd
 ## Limitations
 ### Overexposure
 
-Looking through the images in the dataset, you will notice that it was mostly avoided to face the camera directly at the sun (which was shining almost every day in the [hot and dry summer of Salt Lake City](https://en.wikipedia.org/wiki/Climate_of_Salt_Lake_City)). This was due to a limitation of the [OpenMV H7 cameras](https://openmv.io/products/openmv-cam-h7) used to capture the images. Their dynamic range is limited and they tend to be unable to resolve the high dynamic range when facing the sun directly.
+Looking through the images in the dataset, you will notice that it was mostly avoided to face the cameras directly at the sun (which was shining almost every day in the [hot and dry summer of Salt Lake City](https://en.wikipedia.org/wiki/Climate_of_Salt_Lake_City)). This was due to a limitation of the [OpenMV H7 cameras](https://openmv.io/products/openmv-cam-h7) used to capture the images. Their dynamic range is limited and they tend to be unable to resolve the high dynamic range when facing the sun directly.
 
 <p align="center">
 
@@ -453,10 +454,10 @@ The cameras were used in spite of this issue because of their advantages in prog
 
 ### Weather conditions
 
-As just mentioned, the images show almost exclusively sunny scenes. This is due to them being collected during August, which is the clearest month of the year in Salt Lake City, with [the sky being clear around 78% of the time](https://weatherspark.com/y/2706/Average-Weather-in-Salt-Lake-City-Utah-United-States-Year-Round). The few times it was raining, the camera was not used to avoid damage to the electronics.
+As just mentioned, the images show almost exclusively sunny scenes. This is due to them being mostly collected during August, which is the clearest month of the year in Salt Lake City, with [the sky being clear around 78% of the time](https://weatherspark.com/y/2706/Average-Weather-in-Salt-Lake-City-Utah-United-States-Year-Round). The few times it was raining, the camera was not used to avoid damage to the electronics.
 
 
-# Licensing & Citation
+# Licensing
 
 ## Code
 The code is licensed under the [BSD 3-Clause License](https://opensource.org/licenses/BSD-3-Clause), available under [CODE_LICENSE](CODE_LICENSE.txt).
@@ -472,6 +473,7 @@ The dataset is licensed under the [Creative Commons Attribution 4.0 Internationa
 ## Hardware
 The hardware is licensed under the [CERN Open HArdware License v2 - Weakly Reciprocal (CERN-OHL-W v2)](https://ohwr.org/project/cernohl/wikis/Documents/CERN-OHL-version-2), available under [HARDWARE_LICENSE](HARDWARE_LICENSE.txt).
 
+# Citation
 
 If you use the dataset or any of the code in this repository created by us, please cite the following paper:
 
@@ -487,3 +489,20 @@ If you use the dataset or any of the code in this repository created by us, plea
 # References
 
 * [1]:
+
+
+# Appendix
+
+<details>
+<summary><strong>click to expand</strong></summary>
+
+## Fog Decay Study
+
+We conducted a study on how quickly the fog decays in order to know better how often it needs to be replenished. This was done by filling the fog chamber, letting the fog decay and filming the entire decay using both of the cameras. The resulting video of the fogged camera was analyzed by calculating the [Variance of the Laplacian](https://pyimagesearch.com/2015/09/07/blur-detection-with-opencv/) of each frame as a metric for the intensity of the fog. You can see that after about 5 minutes, the fog intensity becomes quite low.
+
+<p align="center">
+<img src="plots/fog_decay_study.gif" alt="Fog decay" width="700"/>
+<figcaption align = "center"><b>Fog decay measurement over time</b></figcaption>
+</p>
+
+</details>
