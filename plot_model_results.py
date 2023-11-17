@@ -20,6 +20,9 @@ import torch
 
 plt.rc('font', size=13)          # controls default text sizes
 
+title_fontsize = 26
+label_fontsize = 18
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--results_path', required=True, help='path to the results folder (with subfolder test_latest)')
@@ -29,6 +32,9 @@ parser.add_argument('--seed', type=int, default=16, help='seed for the random sh
 parser.add_argument('--ratio', default=4/3, help='aspect ratio of the images (to undo the transformation from pix2pix model)')
 parser.add_argument('--no_laplace', action='store_true', help='if specified, do not plot the Laplacian variance on the fogged images')
 parser.add_argument('--no_fog_colorbar', action='store_true', help='if specified, do not plot the fogginess colorbar below')
+parser.add_argument('--sort_by_laplacian', action='store_true', help='if specified, sort the images by the Laplacian variance')
+parser.add_argument('--specify_image', action='store_true', help='if specified, specify the image to plot')
+parser.add_argument('--image_name', default='', help='name of the image to plot')
 
 args = parser.parse_args()
 
@@ -39,6 +45,9 @@ seed = args.seed
 ratio = args.ratio
 no_laplace = args.no_laplace
 no_fog_colorbar = args.no_fog_colorbar
+sort_by_laplacian = args.sort_by_laplacian
+specify_image = args.specify_image
+image_name = args.image_name
 
 if no_laplace:
     no_fog_colorbar = True
@@ -52,19 +61,17 @@ if type(ratio) != float:
 original_results_path = results_path
 results_path = os.path.join(results_path, 'test_latest/images')
 
-# Creating the colormap for the fogginess of the images
-min_fog_value_limit = -7
-max_fog_value_limit = -5
-center_fog_value_limit = min_fog_value_limit + (max_fog_value_limit - min_fog_value_limit)*0.4
-norm = matplotlib.colors.Normalize(vmin=min_fog_value_limit, vmax=max_fog_value_limit)    # Normalizer for the values of the colormap rating the fogginess of the image: https://stackoverflow.com/questions/25408393/getting-individual-colors-from-a-color-map-in-matplotlib
-
 # CW-SSIM implementation
 gaussian_kernel_sigma = 1.5
 gaussian_kernel_width = 11
 gaussian_kernel_1d = get_gaussian_kernel(gaussian_kernel_width, gaussian_kernel_sigma)
 
 # Indexing the images
-images = [entry for entry in os.listdir(results_path) if 'fake_B' in entry]
+if specify_image:
+    images = [image_name]
+    num_images = 1
+else:
+    images = [entry for entry in os.listdir(results_path) if 'fake_B' in entry]
 
 # Shuffling the images if specified
 if shuffle:
@@ -75,6 +82,30 @@ if shuffle:
 width_per_image = 4
 height_per_image = width_per_image / ratio
 
+images = images[:num_images]
+
+# Computing the Variance of the Laplacian for each of the images
+if not no_laplace:
+
+    laplacian_values = []
+    for i in range(num_images):
+        # Reading in the fogged image and calculating the variance of the Laplacian
+        fogged_image_gray = cv2.cvtColor(cv2.imread(os.path.join(results_path, images[i][:-10] + 'real_A' + '.png')), cv2.COLOR_BGR2GRAY)
+        
+        laplacian_values += [variance_of_laplacian(fogged_image_gray)]
+
+# Sorting the images by the Laplacian variance if specified
+if sort_by_laplacian:
+    both = sorted(zip(laplacian_values, images))
+    laplacian_values = [laplacian_value for laplacian_value, image in both]
+    images = [image for laplacian_value, image in both]
+
+if not no_fog_colorbar or not no_laplace:
+    # Creating the colormap for the fogginess of the images
+    min_fog_value_limit = min(laplacian_values)
+    max_fog_value_limit = max(laplacian_values)
+    center_fog_value_limit = min_fog_value_limit + (max_fog_value_limit - min_fog_value_limit)*0.4
+    norm = matplotlib.colors.Normalize(vmin=min_fog_value_limit, vmax=max_fog_value_limit)    # Normalizer for the values of the colormap rating the fogginess of the image: https://stackoverflow.com/questions/25408393/getting-individual-colors-from-a-color-map-in-matplotlib
 
 if not no_fog_colorbar:
     # Creating the overarching figure containing the images and the colormap (from here: https://stackoverflow.com/questions/34933905/adding-subplots-to-a-subplot)
@@ -97,9 +128,10 @@ else:
     ax = [subfigs.add_subplot(num_images,3,i+1) for i in range(num_images*3)]
 
 # Setting the titles for the images
-ax[0].text(0.5, 1.05, 'reconstructed', fontsize=19, color='k', fontweight='black', ha='center', transform=ax[0].transAxes)
-ax[1].text(0.5, 1.05, 'foggy real', fontsize=19, color='k', fontweight='black', ha='center', transform=ax[1].transAxes)
-ax[2].text(0.5, 1.05, 'ground truth', fontsize=19, color='k', fontweight='black', ha='center', transform=ax[2].transAxes)
+ax[0].text(0.5, 1.05, 'reconstructed', fontsize=title_fontsize, color='k', fontweight='black', ha='center', transform=ax[0].transAxes)
+ax[1].text(0.5, 1.05, 'foggy real', fontsize=title_fontsize, color='k', fontweight='black', ha='center', transform=ax[1].transAxes)
+ax[2].text(0.5, 1.05, 'ground truth', fontsize=title_fontsize, color='k', fontweight='black', ha='center', transform=ax[2].transAxes)
+
 
 for i in range(num_images):
     # Reading in the fake image
@@ -115,9 +147,9 @@ for i in range(num_images):
     fogged_image_gray = cv2.cvtColor(cv2.imread(os.path.join(results_path, images[i][:-10] + 'real_A' + '.png')), cv2.COLOR_BGR2GRAY)
     
     if not no_laplace:
-        fm = variance_of_laplacian(fogged_image_gray)
+        # fm = variance_of_laplacian(fogged_image_gray)
         # Putting the value of the variance of the Laplacian on the image
-        ax[1+3*i].text(0.5,0.03, f'Laplace: {fm:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor=cm.jet(norm(fm)), horizontalalignment='center', verticalalignment='bottom', fontweight='black', color='k' if fm > center_fog_value_limit else 'w')
+        ax[1+3*i].text(0.5,0.03, f'Laplace: {laplacian_values[i]:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor=cm.jet_r(norm(laplacian_values[i])), horizontalalignment='center', verticalalignment='bottom', fontsize=label_fontsize, fontweight='black', color='k' if (laplacian_values[i] > center_fog_value_limit and laplacian_values[i] < center_fog_value_limit+(max_fog_value_limit - min_fog_value_limit)*0.5) else 'w')
     
     ax[1+3*i].axis('off')
 
@@ -133,24 +165,24 @@ for i in range(num_images):
 
     (SSIM_score, SSIM_diff) = structural_similarity(clear_image_nonfloat, fogged_image_nonfloat, full=True, multichannel=True, channel_axis=2)
     # Putting the value of the SSIM on the image
-    ax[1+3*i].text(0,1, f'SSIM: {SSIM_score:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k')
+    ax[1+3*i].text(0,1, f'SSIM: {SSIM_score:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
     
     # Calculating the Pearson correlation coefficient between the two images (https://stackoverflow.com/questions/34762661/percentage-difference-between-two-images-in-python-using-correlation-coefficient, https://mbrow20.github.io/mvbrow20.github.io/PearsonCorrelationPixelAnalysis.html)
     clear_image_gray = cv2.cvtColor(clear_image_nonfloat, cv2.COLOR_BGR2GRAY)
     Pearson_image_correlation = np.corrcoef(np.asarray(fogged_image_gray), np.asarray(clear_image_gray))
     corrImAbs = np.absolute(Pearson_image_correlation)
     # Putting the value of the Pearson correlation coefficient on the image
-    ax[1+3*i].text(1,1, f'Pearson: {np.mean(corrImAbs):.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k')
+    ax[1+3*i].text(1,1, f'Pearson: {np.mean(corrImAbs):.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
 
     # Calculating the SSIM between the fake image and the clear image
-    (SSIM_score_reconstruction, SSIM_diff_reconstruction) = structural_similarity(clear_image_nonfloat, fogged_image_nonfloat, full=True, multichannel=True, channel_axis=2)
+    (SSIM_score_reconstruction, SSIM_diff_reconstruction) = structural_similarity(clear_image_nonfloat, fake_image_nonfloat, full=True, multichannel=True, channel_axis=2)
     # Putting the value of the SSIM on the fake image
-    ax[3*i].text(0,1, f'SSIM (r): {SSIM_score_reconstruction:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k')
+    ax[3*i].text(0,1, f'SSIM (r): {SSIM_score_reconstruction:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
 
     # Calculating the CW-SSIM between the fake image and the clear image (https://github.com/jterrace/pyssim)
     CW_SSIM = SSIM(Image.open(os.path.join(results_path, images[i][:-10] + 'real_B' + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
     # Putting the value of the CW-SSIM on the fake image
-    ax[3*i].text(1,1, f'CW-SSIM (r): {CW_SSIM:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k')
+    ax[3*i].text(1,1, f'CW-SSIM (r): {CW_SSIM:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
 
     # Calculating the MS-SSIM between the fake image and the clear image
     real_img = np.array(Image.open(os.path.join(results_path, images[i][:-10] + 'real_B' + '.png'))).astype(np.float32)
@@ -159,7 +191,7 @@ for i in range(num_images):
     fake_img = torch.from_numpy(fake_img).unsqueeze(0).permute(0, 3, 1, 2)
     MS_SSIM = ms_ssim(real_img, fake_img, data_range=255, size_average=True).item()
     # Putting the value of the MS-SSIM on the fake image
-    ax[3*i].text(1,0, f'MS-SSIM (r): {MS_SSIM:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='bottom', fontweight='black', color='k')
+    ax[3*i].text(1,0, f'MS-SSIM (r): {MS_SSIM:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='bottom', fontweight='black', color='k', fontsize=label_fontsize)
 
 # plt.figure(figsize=(15,10))
 
@@ -173,14 +205,14 @@ if not no_fog_colorbar:
 
     ax = subfigs[1].add_subplot(1, 1, 1)
 
-    plt.imshow(m, cmap='jet', aspect = 2)
+    plt.imshow(m, cmap='jet_r', aspect = 2)
     plt.yticks(np.arange(0))
 
     ax.axis('off')
 
     # Adding labels to the colormap
-    for coordinate, text, ha in zip([0, 100, 200], ['low fog', 'medium fog', 'high fog'], ['left', 'center', 'right']):
-        plt.text(coordinate, -0.7, text, ha=ha, va='bottom', fontweight='black', color='k', fontsize=15)
+    for coordinate, text, ha in zip([0, 100, 200], [f'high fog ({min_fog_value_limit:.2f})', f'medium fog ({min_fog_value_limit + (max_fog_value_limit - min_fog_value_limit)*0.4:.2f})', f'low fog ({max_fog_value_limit:.2f})'], ['left', 'center', 'right']):
+        plt.text(coordinate, -0.7, text, ha=ha, va='bottom', fontweight='black', color='k', fontsize=title_fontsize)
 
     superfig.tight_layout()
 
@@ -188,5 +220,9 @@ else:
     # plt.subplots_adjust(hspace=0, wspace=0)
     plt.tight_layout()
 
-plt.savefig(os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation.pdf"), format='pdf', bbox_inches='tight')
-print("Saved the evaluation plot to", os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation.pdf."))
+if specify_image:
+    plt.savefig(os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation_{image_name}.pdf"), format='pdf', bbox_inches='tight')
+    print("Saved the evaluation plot to", os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation_{image_name}.pdf."))
+else:
+    plt.savefig(os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation.pdf"), format='pdf', bbox_inches='tight')
+    print("Saved the evaluation plot to", os.path.join(original_results_path, f"{original_results_path.split('/')[-1]}_evaluation.pdf."))
