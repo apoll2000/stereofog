@@ -35,6 +35,8 @@ parser.add_argument('--no_fog_colorbar', action='store_true', help='if specified
 parser.add_argument('--sort_by_laplacian', action='store_true', help='if specified, sort the images by the Laplacian variance')
 parser.add_argument('--specify_image', action='store_true', help='if specified, specify the image to plot')
 parser.add_argument('--image_name', default='', help='name of the image to plot')
+parser.add_argument('--model_type', type=str, default='pix2pix', help='type of model used (pix2pix or cycleGAN)')
+parser.add_argument('--dataset_path', type=str, default='', help='path to the dataset for the cycleGAN evaluation')
 
 args = parser.parse_args()
 
@@ -48,6 +50,14 @@ no_fog_colorbar = args.no_fog_colorbar
 sort_by_laplacian = args.sort_by_laplacian
 specify_image = args.specify_image
 image_name = args.image_name
+model_type = args.model_type
+model_type = model_type.lower()
+dataset_path = args.dataset_path
+
+if model_type == 'pix2pix' and dataset_path != '':
+    print('The dataset path is not used for the pix2pix model. Continuing...')
+elif model_type == 'cyclegan' and dataset_path == '':
+    raise ValueError('The dataset path must be specified for the cycleGAN model.')
 
 if no_laplace:
     no_fog_colorbar = True
@@ -71,7 +81,20 @@ if specify_image:
     images = [image_name]
     num_images = 1
 else:
-    images = [entry for entry in os.listdir(results_path) if 'fake_B' in entry]
+    if model_type == 'pix2pix':
+        images = [entry for entry in os.listdir(results_path) if 'fake_B' in entry]
+
+        real_foggy_image_addition = 'real_A'
+        real_clear_image_addition = 'real_B'
+        letters_to_remove = 10
+
+    elif model_type == 'cyclegan':
+        images = [entry for entry in os.listdir(results_path) if 'fake' in entry]
+        real_foggy_image_addition = 'real'
+        dataset_path = os.path.join(dataset_path, 'testA')
+        letters_to_remove = 8
+    else:
+        raise ValueError('The model type must be either "pix2pix" or "cycleGAN".')
 
 # Shuffling the images if specified
 if shuffle:
@@ -90,7 +113,7 @@ if not no_laplace:
     laplacian_values = []
     for i in range(num_images):
         # Reading in the fogged image and calculating the variance of the Laplacian
-        fogged_image_gray = cv2.cvtColor(cv2.imread(os.path.join(results_path, images[i][:-10] + 'real_A' + '.png')), cv2.COLOR_BGR2GRAY)
+        fogged_image_gray = cv2.cvtColor(cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png')), cv2.COLOR_BGR2GRAY)
         
         laplacian_values += [variance_of_laplacian(fogged_image_gray)]
 
@@ -140,11 +163,11 @@ for i in range(num_images):
     ax[3*i].axis('off')
 
     # Reading in the fogged image
-    img2 = plt.imread(os.path.join(results_path, images[i][:-10] + 'real_A' + '.png'))
+    img2 = plt.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png'))
     ax[1+3*i].imshow(img2, aspect='auto')
 
     # Reading in the fogged image again and calculating the variance of the Laplacian
-    fogged_image_gray = cv2.cvtColor(cv2.imread(os.path.join(results_path, images[i][:-10] + 'real_A' + '.png')), cv2.COLOR_BGR2GRAY)
+    fogged_image_gray = cv2.cvtColor(cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png')), cv2.COLOR_BGR2GRAY)
     
     if not no_laplace:
         # fm = variance_of_laplacian(fogged_image_gray)
@@ -154,13 +177,20 @@ for i in range(num_images):
     ax[1+3*i].axis('off')
 
     # Reading in the clear image
-    img3 = plt.imread(os.path.join(results_path, images[i][:-10] + 'real_B' + '.png'))
+    if model_type == 'pix2pix':
+        img3 = plt.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))
+    elif model_type == 'cyclegan':
+        img3 = plt.imread(os.path.join(dataset_path, images[i][:-letters_to_remove] + '.png'))
     ax[2+3*i].imshow(img3, aspect='auto')
     ax[2+3*i].axis('off')
 
     # Reading in the clear image again and calculating the SSIM to get a value for the fogginess (how much the fog changes the image) (https://stackoverflow.com/questions/71567315/how-to-get-the-ssim-comparison-score-between-two-images)
-    clear_image_nonfloat = cv2.imread(os.path.join(results_path, images[i][:-10] + 'real_B' + '.png'))
-    fogged_image_nonfloat = cv2.imread(os.path.join(results_path, images[i][:-10] + 'real_A' + '.png'))
+    if model_type == 'pix2pix':
+        clear_image_nonfloat = cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))
+    elif model_type == 'cyclegan':
+        clear_image_nonfloat = cv2.imread(os.path.join(dataset_path, images[i][:-letters_to_remove] + '.png'))
+    fogged_image_nonfloat = cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png'))
+
     fake_image_nonfloat = cv2.imread(os.path.join(results_path, images[i]))
 
     (SSIM_score, SSIM_diff) = structural_similarity(clear_image_nonfloat, fogged_image_nonfloat, full=True, multichannel=True, channel_axis=2)
@@ -180,12 +210,18 @@ for i in range(num_images):
     ax[3*i].text(0,1, f'SSIM (r): {SSIM_score_reconstruction:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
 
     # Calculating the CW-SSIM between the fake image and the clear image (https://github.com/jterrace/pyssim)
-    CW_SSIM = SSIM(Image.open(os.path.join(results_path, images[i][:-10] + 'real_B' + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
+    if model_type == 'pix2pix':
+        CW_SSIM = SSIM(Image.open(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
+    elif model_type == 'cyclegan':
+        CW_SSIM = SSIM(Image.open(os.path.join(dataset_path, images[i][:-letters_to_remove] + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
     # Putting the value of the CW-SSIM on the fake image
     ax[3*i].text(1,1, f'CW-SSIM (r): {CW_SSIM:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
 
     # Calculating the MS-SSIM between the fake image and the clear image
-    real_img = np.array(Image.open(os.path.join(results_path, images[i][:-10] + 'real_B' + '.png'))).astype(np.float32)
+    if model_type == 'pix2pix':
+        real_img = np.array(Image.open(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))).astype(np.float32)
+    elif model_type == 'cyclegan':
+        real_img = np.array(Image.open(os.path.join(dataset_path, images[i][:-letters_to_remove] + '.png'))).astype(np.float32)
     real_img = torch.from_numpy(real_img).unsqueeze(0).permute(0, 3, 1, 2)
     fake_img = np.array(Image.open(os.path.join(results_path, images[i]))).astype(np.float32)
     fake_img = torch.from_numpy(fake_img).unsqueeze(0).permute(0, 3, 1, 2)
