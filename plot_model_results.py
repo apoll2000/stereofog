@@ -84,17 +84,22 @@ else:
     if model_type == 'pix2pix':
         images = [entry for entry in os.listdir(results_path) if 'fake_B' in entry]
 
-        real_foggy_image_addition = 'real_A'
-        real_clear_image_addition = 'real_B'
-        letters_to_remove = 10
-
     elif model_type == 'cyclegan':
         images = [entry for entry in os.listdir(results_path) if 'fake' in entry]
-        real_foggy_image_addition = 'real'
-        dataset_path = os.path.join(dataset_path, 'testA')
-        letters_to_remove = 8
+
     else:
         raise ValueError('The model type must be either "pix2pix" or "cycleGAN".')
+
+# Defining commonly used variables
+if model_type == 'pix2pix':
+    real_foggy_image_addition = 'real_A'
+    real_clear_image_addition = 'real_B'
+    letters_to_remove = 10
+elif model_type == 'cyclegan':
+    real_foggy_image_addition = 'real'
+    dataset_path = os.path.join(dataset_path, 'testA')
+    letters_to_remove = 8
+
 
 # Shuffling the images if specified
 if shuffle:
@@ -172,24 +177,25 @@ for i in range(num_images):
     if not no_laplace:
         # fm = variance_of_laplacian(fogged_image_gray)
         # Putting the value of the variance of the Laplacian on the image
-        ax[1+3*i].text(0.5,0.03, f'Laplace: {laplacian_values[i]:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor=cm.jet_r(norm(laplacian_values[i])), horizontalalignment='center', verticalalignment='bottom', fontsize=label_fontsize, fontweight='black', color='k' if (laplacian_values[i] > center_fog_value_limit and laplacian_values[i] < center_fog_value_limit+(max_fog_value_limit - min_fog_value_limit)*0.5) else 'w')
-    
+        ax[1+3*i].text(0.5,0.03, '$\mathbf{v_{L}}$: %.2f' %laplacian_values[i], transform=ax[1+3*i].transAxes, backgroundcolor=cm.jet_r(norm(laplacian_values[i])), horizontalalignment='center', verticalalignment='bottom', fontsize=label_fontsize, fontweight='black', color='k' if (laplacian_values[i] > center_fog_value_limit and laplacian_values[i] < center_fog_value_limit+(max_fog_value_limit - min_fog_value_limit)*0.5) else 'w')
+  
     ax[1+3*i].axis('off')
 
     # Reading in the clear image
     if model_type == 'pix2pix':
         img3 = plt.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))
     elif model_type == 'cyclegan':
-        img3 = plt.imread(os.path.join(dataset_path, images[i][:-letters_to_remove] + '.png'))
+        img3 = plt.imread(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png'))
     ax[2+3*i].imshow(img3, aspect='auto')
     ax[2+3*i].axis('off')
 
     # Reading in the clear image again and calculating the SSIM to get a value for the fogginess (how much the fog changes the image) (https://stackoverflow.com/questions/71567315/how-to-get-the-ssim-comparison-score-between-two-images)
+    fogged_image_nonfloat = cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png'))
     if model_type == 'pix2pix':
         clear_image_nonfloat = cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))
     elif model_type == 'cyclegan':
-        clear_image_nonfloat = cv2.imread(os.path.join(dataset_path, images[i][:-letters_to_remove] + '.png'))
-    fogged_image_nonfloat = cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png'))
+        h, w, c = fogged_image_nonfloat.shape
+        clear_image_nonfloat = cv2.resize(cv2.imread(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png')), (w, h))
 
     fake_image_nonfloat = cv2.imread(os.path.join(results_path, images[i]))
 
@@ -213,7 +219,7 @@ for i in range(num_images):
     if model_type == 'pix2pix':
         CW_SSIM = SSIM(Image.open(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
     elif model_type == 'cyclegan':
-        CW_SSIM = SSIM(Image.open(os.path.join(dataset_path, images[i][:-letters_to_remove] + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
+        CW_SSIM = 0#SSIM(Image.open(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
     # Putting the value of the CW-SSIM on the fake image
     ax[3*i].text(1,1, f'CW-SSIM (r): {CW_SSIM:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
 
@@ -221,7 +227,7 @@ for i in range(num_images):
     if model_type == 'pix2pix':
         real_img = np.array(Image.open(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))).astype(np.float32)
     elif model_type == 'cyclegan':
-        real_img = np.array(Image.open(os.path.join(dataset_path, images[i][:-letters_to_remove] + '.png'))).astype(np.float32)
+        real_img = np.array(Image.open(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png')).resize((w, h))).astype(np.float32)
     real_img = torch.from_numpy(real_img).unsqueeze(0).permute(0, 3, 1, 2)
     fake_img = np.array(Image.open(os.path.join(results_path, images[i]))).astype(np.float32)
     fake_img = torch.from_numpy(fake_img).unsqueeze(0).permute(0, 3, 1, 2)
