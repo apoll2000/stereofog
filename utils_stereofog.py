@@ -26,7 +26,7 @@ import torchvision.transforms as T
 def variance_of_laplacian(image):
 	# compute the Laplacian of the image and then return the focus
 	# measure, which is simply the variance of the Laplacian
-	return -cv2.Laplacian(image, cv2.CV_32F).var()
+	return cv2.Laplacian(image, cv2.CV_32F).var()
 
 # Code for calculating the MSE between two images (https://www.tutorialspoint.com/how-to-compare-two-images-in-opencv-python)
 def image_mse(img1, img2):
