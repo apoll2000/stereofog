@@ -40,10 +40,13 @@ num_models = len(subfolders)
 
 if results_path.split('/')[-1].count('_') == 1:
     models = [item.replace(results_path.split('/')[-1] + '_', '') for item in subfolders]
-    models = sorted(models)
+
 else:
     models = [item.replace('hyperparameter_', '') for item in subfolders]
-    models = sorted(models)
+
+both = sorted(zip(models, subfolders))
+models = [model for model, subfolder in both]
+subfolders = [subfolder for model, subfolder in both]
 
 # Part that needs to be inserted due to the way pix2pix saves the images
 subpath_addition = f'test_{epoch}/images'
@@ -105,8 +108,8 @@ scores = {  'Pearson': Pearson_correlation_scores,
 if not flip:
     fig, ax = plt.subplots(limit, num_models+2, figsize=(width_per_image*(num_models+2), height_per_image*limit))
 
-    ax[0, 0].text(0.5,1.11, 'foggy real', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k')
-    ax[0, 1].text(0.5,1.11, 'ground truth', transform=ax[0, 1].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k')
+    ax[0, 0].text(0.5,1.105, 'foggy real', transform=ax[0, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k')
+    ax[0, 1].text(0.5,1.105, 'ground truth', transform=ax[0, 1].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k')
 
     for i in range(limit):
 
@@ -125,7 +128,7 @@ if not flip:
             img = plt.imread(os.path.join(results_path, subfolders[j], subpath_addition, images_to_plot[i]))
             ax[i, j+2].imshow(img, aspect='auto')
             if i == 0:
-                ax[i, j+2].text(0.5,1.11, models[j], transform=ax[i, j+2].transAxes, horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k', zorder=20)
+                ax[i, j+2].text(0.5,1.105, models[j], transform=ax[i, j+2].transAxes, horizontalalignment='center', verticalalignment='center', fontsize=fontsize, fontweight='black', color='k', zorder=20)
             ax[i, j+2].axis('off')
 
     # Plotting each model's scores
