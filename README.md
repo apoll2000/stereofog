@@ -1,8 +1,12 @@
-# stereofog - PAPER NAME ![visitors](https://visitor-badge.glitch.me/badge?page_id=apoll2000.stereofog&left_color=green&right_color=red) ![Visitors](https://api.visitorbadge.io/api/visitors?path=apoll2000%2Fstereofog&countColor=%23263759)
-Github io page link | Arxiv/paper link | [<img src="https://www.edigitalagency.com.au/wp-content/uploads/YouTube-icon-red-png.png" height="16">](https://youtu.be/P8lyz_wZo2c) |...
+# STEREOFOG - Computational DeFogging via Image-to-Image Translation on a real-world Dataset ![Visitors](https://api.visitorbadge.io/api/visitors?path=apoll2000%2Fstereofog&countColor=%23263759)
+Github io page link | Arxiv/paper link | [<img src="https://www.edigitalagency.com.au/wp-content/uploads/YouTube-icon-red-png.png" height="16">](https://youtu.be/P8lyz_wZo2c)
+
+The STEREOFOG dataset is available here: [tubcloud](https://tubcloud.tu-berlin.de/s/eXwHQyfbzkbTdej)
+
+The Supplement 1 PDF is available here: [tubcloud](https://tubcloud.tu-berlin.de/s/s6ofNFzjLt4AnY4)
 
 ## News
-nothing to show here (yet)
+nothing to show here
 
 ---
 
