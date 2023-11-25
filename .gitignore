@@ -167,13 +167,19 @@ results
 backup
 checkpoints
 docs
-slurm*.*
 plots
+segmentation_models
+
+# File Endings
+slurm*.*
 *.bmp
 *.png
 *.jpg
 *.jpeg
 *.drawio
+*.dtmp
+*.bkp
+*.pdf
 
 # Random user-defined files
 Utah_Utes_-_U_logo.png
