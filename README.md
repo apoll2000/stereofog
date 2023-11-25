@@ -22,13 +22,10 @@ This repository documents a research project carried out at the [Laboratory for 
 
 > Disclaimer: This work was supported by a fellowship of the German Academic Exchange Service (DAAD).
 
-*potentially add some cool gifs here*
-*insert preliminary results, logos, images, etc. as teaser here*
 
-
- fogged image  |  real image  |   synthetic image 
+ real image  |  foggy image  |   reconstructed image 
 :-------------------------:|:-------------------------:|:-------------------------:
-![](images/01-04_08_23__736_B.bmp) |  ![](images/01-04_08_23__736_A.bmp) | ![](images/01-04_08_23__736_A.bmp)
+![](images/2023-08-01-04__736_real_B.bmp) |  ![](images/2023-08-01-04__736_real_A.bmp) | ![](images/2023-08-01-04__736_fake_B.bmp)
 
 <p align="center">
 <img src="results/epochs/hyperparameter_GAN_vanilla_epochs_results/hyperparameter_GAN_vanilla_epochs_results.gif" alt="Adafruit Feather 32u4 Radio board" width="700"/>
@@ -49,8 +46,10 @@ This repository documents a research project carried out at the [Laboratory for 
     - [Wiring \& Programming](#wiring--programming)
     - [Gimbal](#gimbal)
     - [Case](#case)
-    - [Bla?](#bla)
-  - [Python environment](#python-environment)
+    - [Bill of Materials (BoM)](#bill-of-materials-bom)
+    - [CAD file attributions](#cad-file-attributions)
+  - [Model Training](#model-training)
+  - [Getting started](#getting-started)
   - [Synthetic data](#synthetic-data)
     - [Foggy Cityscapes from Uni Tübingen](#foggy-cityscapes-from-uni-tübingen)
     - [Foggy Cityscapes from ETH Zürich](#foggy-cityscapes-from-eth-zürich)
@@ -58,6 +57,11 @@ This repository documents a research project carried out at the [Laboratory for 
     - [Foggy KITTI from Uni Tübingen (?)](#foggy-kitti-from-uni-tübingen-)
   - [Collected dataset](#collected-dataset)
   - [pix2pix on dataset](#pix2pix-on-dataset)
+  - [Limitations](#limitations)
+  - [Licensing](#licensing)
+  - [Citation](#citation)
+  - [References](#references)
+  - [Appendix](#appendix)
 
 
 ## Goal
@@ -408,7 +412,26 @@ Ample information on the training and testing process and their parameters can b
 </details>
 
 ### 7. Helper scripts
-This GitHub page includes several helper scripts to perform different actions like hyperparameter tuning or epoch visualization...
+This GitHub page includes several helper scripts to perform different actions like hyperparameter tuning or epoch visualization.
+
+These are:
+Preprocessing:
+- `preprocess_stereofog_dataset.py`
+Hyperparameter tuning:
+- `hyperparameter_dropoutRate.py`
+- `hyperparameter_GAN.py`
+- `hyperparameter_init_type.py`
+- `hyperparameter_lr_policy.py`
+- `hyperparameter_n_layers_D.py`
+- `hyperparameter_netD.py`
+- `hyperparameter_netG.py`
+- `hyperparameter_ngf_ndf.py`
+- `hyperparameter_normalization.py`
+- `hyperparameter_Res9AndMore.py`
+- `hyperparameter_supertraining.py`
+Visualization:
+- `plot_model_results.py`
+- `evaluate_model_group.py`
 
 ## Synthetic data
 
