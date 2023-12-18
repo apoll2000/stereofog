@@ -1,9 +1,9 @@
 # STEREOFOG - Computational DeFogging via Image-to-Image Translation on a real-world Dataset ![Visitors](https://api.visitorbadge.io/api/visitors?path=apoll2000%2Fstereofog&countColor=%23263759)
-Github io page link | Arxiv/paper link | [<img src="https://www.edigitalagency.com.au/wp-content/uploads/YouTube-icon-red-png.png" height="16">](https://youtu.be/P8lyz_wZo2c)
+Github io page link | [<img src="https://static-00.iconduck.com/assets.00/arxiv-icon-1024x301-v4aiipf1.png" height="16">](http://arxiv.org/abs/2312.02344) | [<img src="https://www.edigitalagency.com.au/wp-content/uploads/YouTube-icon-red-png.png" height="16">](https://youtu.be/P8lyz_wZo2c)
 
-The STEREOFOG dataset is available here: [tubcloud](https://tubcloud.tu-berlin.de/s/eXwHQyfbzkbTdej)
+The STEREOFOG dataset is available here: [GDrive](https://drive.google.com/drive/folders/1Tzo1lDyHiiTZUwWrtjHaJ5GObJZZZMe1?usp=share_link) | [tubcloud](https://tubcloud.tu-berlin.de/s/eXwHQyfbzkbTdej)
 
-The Supplement 1 PDF is available here: [tubcloud](https://tubcloud.tu-berlin.de/s/s6ofNFzjLt4AnY4)
+The Supplement 1 PDF is available here: [GDrive](https://drive.google.com/file/d/1-u44cPluL7TxL03BzMC0Y1bDo7aJvyuR/view?usp=share_link) | [tubcloud](https://tubcloud.tu-berlin.de/s/s6ofNFzjLt4AnY4)
 
 ## News
 nothing to show here
@@ -11,7 +11,7 @@ nothing to show here
 ---
 
 <p align="center">
-<img src="images/stereofog_logo.png" alt="OpenMV H7 camera" width="275"/>
+<img src="images/stereofog_logo.png" alt="Stereofog logo" width="275"/>
 </p>
 
 <p align="center">
