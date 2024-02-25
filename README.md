@@ -5,6 +5,12 @@ The STEREOFOG dataset is available here: [GDrive](https://drive.google.com/drive
 
 The Supplement 1 PDF is available here: [GDrive](https://drive.google.com/file/d/1-u44cPluL7TxL03BzMC0Y1bDo7aJvyuR/view?usp=share_link) | [tubcloud](https://tubcloud.tu-berlin.de/s/s6ofNFzjLt4AnY4)
 
+## Graphical Abstract
+<p align="center">
+<img src="images/paper_headline_image.png" alt="Graphical abstract" width="700"/>
+<figcaption align = "center"><b>Overview of the STEREOFOG project. a): A diagram summarizing the work done in this work. b): Example results obtained by applying the pix2pix framework to the STEREOFOG dataset. Our approach works for a range of fog densities.</b></figcaption>
+</p>
+
 ## News
 nothing to show here
 
@@ -214,7 +220,7 @@ The entire `python` code for the cameras can be found in the respective [script]
 ### Gimbal
 
 <p align="center">
-<img src="https://www.bhphotovideo.com/cdn-cgi/image/format=auto,fit=scale-down,width=500,quality=95/https://www.bhphotovideo.com/images/images500x500/hohem_isteady_q_blk_isteady_q_smart_selfie_1661443536_1706042.jpg" alt="Schematics for the fog device" width="400"/>
+<img src="https://www.bhphotovideo.com/cdn-cgi/image/format=auto,fit=scale-down,width=500,quality=95/https://www.bhphotovideo.com/images/images500x500/hohem_isteady_q_blk_isteady_q_smart_selfie_1661443536_1706042.jpg" alt="Gimbal model used in this project" width="400"/>
 <figcaption align = "center"><b>Gimbal model used in this project</b></figcaption>
 </p>
 
@@ -252,6 +258,30 @@ The case was designed in [Fusion 360](https://www.autodesk.com/products/fusion-3
 <img src="images/fog_device_assembly_3D_print_box_rear.png" alt="Rear view of entire CAD design" width="600"/>
 <figcaption align = "center"><b>Rear view of entire CAD design</b></figcaption>
 </p>
+
+### Handheld fogger
+Initially, the following small handheld fogger was used:
+
+<p align="center">
+<img src="images/old_fogger.jpeg" alt="The old handheld fog machine" width="400"/>
+<figcaption align = "center"><b>The old handheld fog machine</b></figcaption>
+</p>
+
+For filling the device's fog chamber, its nozzle was inserted into the opening at the bottom of the chamber, while allowing air to escape through the opening at the top, inside the maintenance door. Since there was no perfect seal between the nozzle and the chamber, refilling took longer than necessary.
+
+In the updated prototype, a new fogger with a plastic tube was used. This was directly ported into the chamber through a pneumatic fitting. This allowed for nearly lossless filling of the fog chamber.
+
+
+
+<p align="center">
+<img src="images/new_fogger.jpeg" alt="The new handheld fog machine" width="200"/>
+<figcaption align = "center"><b>The new handheld fog machine</b></figcaption>
+</p>
+
+ CAD design  |  physical prototype 
+:-------------------------:|:-------------------------:
+![](images/fog_port_washer_CAD.png) |  ![](images/fog_port_washer_real.jpg)
+
 
 ### Bill of Materials (BoM)
 The following components are required for the device:
@@ -505,11 +535,13 @@ The hardware is licensed under the [CERN Open HArdware License v2 - Weakly Recip
 If you use the dataset or any of the code in this repository created by us, please cite the following paper:
 
 ```
-@article{TEST,
-  title={Stereofog: ...},
-  author={...},
-  journal={...},
-  year={2023}
+@misc{pollak2023stereofog,
+      title={STEREOFOG -- Computational DeFogging via Image-to-Image Translation on a real-world Dataset}, 
+      author={Anton Pollak and Rajesh Menon},
+      year={2023},
+      eprint={2312.02344},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
 }
 ```
 
