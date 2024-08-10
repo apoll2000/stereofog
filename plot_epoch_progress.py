@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('--checkpoints_path', required=True, help='path to images (should have subfolders trainA, trainB, valA, valB, etc)')
 parser.add_argument('--model_name', type=str, default=None, help='Override model name (if it should not be inferred from the dataroot))')
-parser.add_argument('--verbosity', type=int, default=1, help='verbosity level (i.e., print every `verbosity` epochs)')
+parser.add_argument('--verbosity', type=int, default=5, help='verbosity level (i.e., print every `verbosity` epochs)')
 parser.add_argument('--ratio', type=float, default=4/3, help='aspect ratio of the images (to undo the transformation from pix2pix model)')
 parser.add_argument('--image_index', type=int, default=0, help='try another image if the first one is not suitable')
 parser.add_argument('--output_type', type=str, default='image', help='output type (image or gif)')
@@ -129,7 +129,7 @@ for i, epoch in enumerate(epochs[::verbosity]):
         
     #     image_index = 0 # make sure that all images use this index now
 
-    mean_SSIM, mean_CW_SSIM = calculate_model_results(os.path.join(results_path, str(epoch)), epoch=epoch, epoch_test=True)
+    mean_Pearson, mean_MSE, mean_NCC, mean_SSIM, mean_CW_SSIM, mean_MS_SSIM = calculate_model_results(os.path.join(results_path, str(epoch)), epoch=epoch, epoch_test=True)
 
     mean_CW_SSIM_scores.append(mean_CW_SSIM)
 
