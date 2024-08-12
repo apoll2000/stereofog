@@ -75,6 +75,7 @@ def calculate_model_results(results_path, epoch='latest', epoch_test=False):
 
     Pearson_image_correlations = []
     MSE_scores = []
+    PSNR_scores = []
     NCC_scores = []
     SSIM_scores = []
     CW_SSIM_scores = []
@@ -100,6 +101,9 @@ def calculate_model_results(results_path, epoch='latest', epoch_test=False):
         # Calculating the MSE between the two images
         MSE_score = image_mse(clear_image_gray, fake_image_gray)
         MSE_scores.append(MSE_score)
+
+        PSNR_score = cv2.PSNR(clear_image_nonfloat, fake_image_nonfloat)
+        PSNR_scores.append(PSNR_score)
 
         # Calculating the NCC between the two images
         NCC_score = image_ncc(clear_image_gray, fake_image_gray)
@@ -127,12 +131,13 @@ def calculate_model_results(results_path, epoch='latest', epoch_test=False):
     # Calculate the average values
     mean_Pearson = np.mean(Pearson_image_correlations)
     mean_MSE = np.mean(MSE_scores)
+    mean_PSNR = np.mean(PSNR_scores)
     mean_NCC = np.mean(NCC_scores)
     mean_SSIM = np.mean(SSIM_scores)
     mean_CW_SSIM = np.mean(CW_SSIM_scores)
     mean_MS_SSIM = np.mean(MS_SSIM_scores)
 
-    return mean_Pearson, mean_MSE, mean_NCC, mean_SSIM, mean_CW_SSIM, mean_MS_SSIM
+    return mean_Pearson, mean_MSE, mean_PSNR, mean_NCC, mean_SSIM, mean_CW_SSIM, mean_MS_SSIM
     
 # Code source: https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/issues/1161
 def generate_stats_from_log(experiment_name, line_interval=10, nb_data=10800, enforce_last_line=True, fig = None, ax = None, highlight_epoch=None):

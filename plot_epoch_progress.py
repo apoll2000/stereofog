@@ -129,7 +129,7 @@ for i, epoch in enumerate(epochs[::verbosity]):
         
     #     image_index = 0 # make sure that all images use this index now
 
-    mean_Pearson, mean_MSE, mean_NCC, mean_SSIM, mean_CW_SSIM, mean_MS_SSIM = calculate_model_results(os.path.join(results_path, str(epoch)), epoch=epoch, epoch_test=True)
+    mean_Pearson, mean_MSE, mean_PSNR, mean_NCC, mean_SSIM, mean_CW_SSIM, mean_MS_SSIM = calculate_model_results(os.path.join(results_path, str(epoch)), epoch=epoch, epoch_test=True)
 
     mean_CW_SSIM_scores.append(mean_CW_SSIM)
 

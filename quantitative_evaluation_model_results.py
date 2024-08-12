@@ -68,7 +68,12 @@ results_path = args.results_path
 
 #         return mean_SSIM, mean_CW_SSIM
 
-mean_SSIM, mean_CW_SSIM = calculate_model_results(results_path)
+mean_Pearson, mean_MSE, mean_PSNR, mean_NCC, mean_SSIM, mean_CW_SSIM, mean_MS_SSIM = calculate_model_results(results_path)
 
+print(f"Mean Pearson: {mean_Pearson:.2f}")
+print(f"Mean MSE: {mean_MSE:.2f}")
+print(f"Mean PSNR: {mean_PSNR:.2f}")
+print(f"Mean NCC: {mean_NCC:.2f}")
 print(f"Mean SSIM: {mean_SSIM:.2f}")
 print(f"Mean CW-SSIM: {mean_CW_SSIM:.2f}")
+print(f"Mean MS-SSIM: {mean_MS_SSIM:.2f}")
