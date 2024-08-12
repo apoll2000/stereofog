@@ -15,6 +15,7 @@ parser.add_argument('--shuffle', action='store_true', help='if specified, shuffl
 parser.add_argument('--seed', type=int, default=16, help='seed for the random shuffling of the images')
 parser.add_argument('--flip', action='store_true', help='if specified, make the columns correspond to different test images, not different models (i.e., rows and columns are flipped)')
 parser.add_argument('--epoch', type=int, default=-1, help='epoch to plot the results of')
+parser.add_argument('--dont_save_figure', action='store_true', help='do not save the final evaluation figure')
 
 results_path = parser.parse_args().results_path
 ratio = parser.parse_args().ratio
@@ -23,6 +24,7 @@ shuffle = parser.parse_args().shuffle
 seed = parser.parse_args().seed
 flip = parser.parse_args().flip
 epoch = parser.parse_args().epoch
+dont_save_figure = parser.parse_args().dont_save_figure
 
 fontsize = 20
 
@@ -79,18 +81,20 @@ height_per_image = width_per_image / ratio
 # ax[1].text(0.5, 1.05, 'foggy real', fontsize=15, color='k', fontweight='black', ha='center', transform=ax[1].transAxes)
 # ax[2].text(0.5, 1.05, 'clear real', fontsize=15, color='k', fontweight='black', ha='center', transform=ax[2].transAxes)
 
-# Calculating SSIM and CW-SSIM scores for each model
+# Calculating evaluation scores for each model
 Pearson_correlation_scores = []
 MSE_scores = []
+PSNR_scores = []
 NCC_scores = []
 SSIM_scores = []
 CW_SSIM_scores = []
 MS_SSIM_scores = []
 
 for model_index, model in enumerate(models):
-    mean_Pearson, mean_MSE, mean_NCC, mean_SSIM, mean_CW_SSIM, mean_MS_SSIM = calculate_model_results(os.path.join(results_path, subfolders[model_index]), epoch=epoch)
+    mean_Pearson, mean_MSE, mean_PSNR, mean_NCC, mean_SSIM, mean_CW_SSIM, mean_MS_SSIM = calculate_model_results(os.path.join(results_path, subfolders[model_index]), epoch=epoch)
     Pearson_correlation_scores.append(mean_Pearson)
     MSE_scores.append(mean_MSE)
+    PSNR_scores.append(mean_PSNR)
     NCC_scores.append(mean_NCC)
     SSIM_scores.append(mean_SSIM)
     CW_SSIM_scores.append(mean_CW_SSIM)
@@ -98,6 +102,7 @@ for model_index, model in enumerate(models):
 
 scores = {  'Pearson': Pearson_correlation_scores,
             'MSE': MSE_scores,
+            'PSNR': PSNR_scores,
             'NCC': NCC_scores,
             'SSIM': SSIM_scores,
             'CW-SSIM': CW_SSIM_scores,
@@ -173,6 +178,9 @@ else:
     #     ax[j+2, 0].text(-0.1,0.5, f'SSIM:{SSIM_scores[j]:.2f}\nCW-SSIM:{CW_SSIM_scores[j]:.2f}', transform=ax[j+2, 0].transAxes, backgroundcolor='w', horizontalalignment='center', verticalalignment='center', fontsize=12, fontweight='black', color='k', rotation='vertical')
 
 plt.subplots_adjust(hspace=0, wspace=0)
-plt.savefig(os.path.join(f"{results_path}", f"{hyperparameter}_evaluation.pdf"), bbox_inches='tight', format='pdf', pad_inches=0)
 
-print(f"Saved evaluation figure to {os.path.join(f'{results_path}', f'{hyperparameter}_evaluation.pdf')}.")
+if dont_save_figure:
+    plt.show()
+else:
+    plt.savefig(os.path.join(f"{results_path}", f"{hyperparameter}_evaluation.pdf"), bbox_inches='tight', format='pdf', pad_inches=0)
+    print(f"Saved evaluation figure to {os.path.join(f'{results_path}', f'{hyperparameter}_evaluation.pdf')}.")
