@@ -167,14 +167,14 @@ results
 backup
 checkpoints
 docs
-plots
+# plots
 segmentation_models
-
+segmented_images
 # File Endings
 slurm*.*
-*.bmp
-*.png
-*.jpg
+# *.bmp
+# *.png
+# *.jpg
 *.jpeg
 *.drawio
 *.dtmp
