@@ -20,7 +20,8 @@ import torch
 
 plt.rc('font', size=13)          # controls default text sizes
 
-title_fontsize = 26
+title_fontsize_horizontal = 26
+title_fontsize_vertical = 22
 label_fontsize = 18
 
 parser = argparse.ArgumentParser()
@@ -40,6 +41,7 @@ parser.add_argument('--dataset_path', type=str, default='', help='path to the da
 parser.add_argument('--change_column_order', action='store_true', help='if specified, change the column order to foggy-predicted-clear instead of predicted-foggy-clear')
 parser.add_argument('--dont_save_figure', action='store_true', help='if specified, only show figure, do not save it')
 parser.add_argument('--add_title_indices', action='store_true', help='if specified, add title indices (like a) foggy, etc.')
+parser.add_argument('--flip', action='store_true', help='if specified, make the columns correspond to different test images, not foggy, reconstructed and clear (i.e., rows and columns are flipped)')
 
 args = parser.parse_args()
 
@@ -59,6 +61,7 @@ dataset_path = args.dataset_path
 change_column_order = args.change_column_order
 dont_save_figure = args.dont_save_figure
 add_title_indices = args.add_title_indices
+flip = args.flip
 
 if model_type == 'pix2pix' and dataset_path != '':
     print('The dataset path is not used for the pix2pix model. Continuing...')
@@ -143,23 +146,37 @@ if not no_fog_colorbar or not no_laplace:
 
 if not no_fog_colorbar:
     # Creating the overarching figure containing the images and the colormap (from here: https://stackoverflow.com/questions/34933905/adding-subplots-to-a-subplot)
-    superfig = plt.figure(figsize=(3*width_per_image,((num_images + 0.1)*height_per_image)))
+    if not flip:
+        superfig = plt.figure(figsize=(3*width_per_image,((num_images + 0.1)*height_per_image)))
+    else:
+        superfig = plt.figure(figsize=(num_images*width_per_image,((3 + 0.1)*height_per_image)))
 
     # Creating the subfigures for the images and the colormap
     subfigs = superfig.subfigures(2, 1, height_ratios=[num_images, 0.1*num_images])
 
     # Creating the subplots for the images
-    ax = [subfigs[0].add_subplot(num_images,3,i+1) for i in range(num_images*3)]
+    if not flip:
+        ax = [subfigs[0].add_subplot(num_images,3,i+1) for i in range(num_images*3)]
+    else:
+        ax = [subfigs[0].add_subplot(3, num_images,i+1) for i in range(num_images*3)]
 
 else:
     # Creating the overarching figure containing the images and the colormap (from here: https://stackoverflow.com/questions/34933905/adding-subplots-to-a-subplot)
-    superfig = plt.figure(figsize=(3*width_per_image,((num_images)*height_per_image)))
+    if not flip:
+        superfig = plt.figure(figsize=(3*width_per_image,((num_images)*height_per_image)))
+    else:
+        superfig = plt.figure(figsize=(num_images*width_per_image,(3*height_per_image)))
 
     # Creating the subfigures for the images and the colormap
     subfigs = superfig.subfigures(1, 1)#, height_ratios=[num_images, 0.1*num_images])
 
     # Creating the subplots for the images
-    ax = [subfigs.add_subplot(num_images,3,i+1) for i in range(num_images*3)]
+    if not flip:
+        ax = [subfigs.add_subplot(num_images,3,i+1) for i in range(num_images*3)]
+    else:
+        ax = [subfigs.add_subplot(3, num_images,i+1) for i in range(num_images*3)]
+
+
 
 # Setting the titles for the images
 if add_title_indices:
@@ -169,118 +186,233 @@ if add_title_indices:
 else:
     title_pre_string_a = title_pre_string_b = title_pre_string_c = ''
 
-if not change_column_order:
-    ax[0].text(0.5, 1.05, f'{title_pre_string_a}reconstructed', fontsize=title_fontsize, color='k', fontweight='black', ha='center', transform=ax[0].transAxes)
-    ax[1].text(0.5, 1.05, f'{title_pre_string_b}foggy real', fontsize=title_fontsize, color='k', fontweight='black', ha='center', transform=ax[1].transAxes)
-    ax[2].text(0.5, 1.05, f'{title_pre_string_c}ground truth', fontsize=title_fontsize, color='k', fontweight='black', ha='center', transform=ax[2].transAxes)
+if not flip:
+    if not change_column_order:
+        ax[0].text(0.5, 1.05, f'{title_pre_string_a}reconstructed', fontsize=title_fontsize_horizontal, color='k', fontweight='black', ha='center', transform=ax[0].transAxes)
+        ax[1].text(0.5, 1.05, f'{title_pre_string_b}foggy real', fontsize=title_fontsize_horizontal, color='k', fontweight='black', ha='center', transform=ax[1].transAxes)
+        ax[2].text(0.5, 1.05, f'{title_pre_string_c}ground truth', fontsize=title_fontsize_horizontal, color='k', fontweight='black', ha='center', transform=ax[2].transAxes)
+    else:
+        ax[0].text(0.5, 1.05, f'{title_pre_string_a}foggy real', fontsize=title_fontsize_horizontal, color='k', fontweight='black', ha='center', transform=ax[0].transAxes)
+        ax[1].text(0.5, 1.05, f'{title_pre_string_b}reconstructed', fontsize=title_fontsize_horizontal, color='k', fontweight='black', ha='center', transform=ax[1].transAxes)
+        ax[2].text(0.5, 1.05, f'{title_pre_string_c}ground truth', fontsize=title_fontsize_horizontal, color='k', fontweight='black', ha='center', transform=ax[2].transAxes)
 else:
-    ax[0].text(0.5, 1.05, f'{title_pre_string_a}foggy real', fontsize=title_fontsize, color='k', fontweight='black', ha='center', transform=ax[0].transAxes)
-    ax[1].text(0.5, 1.05, f'{title_pre_string_b}reconstructed', fontsize=title_fontsize, color='k', fontweight='black', ha='center', transform=ax[1].transAxes)
-    ax[2].text(0.5, 1.05, f'{title_pre_string_c}ground truth', fontsize=title_fontsize, color='k', fontweight='black', ha='center', transform=ax[2].transAxes)
+    if not change_column_order:
+        ax[0].text(-0.05, 0.5, f'{title_pre_string_a}reconstructed', fontsize=title_fontsize_vertical, color='k', fontweight='black', ha='right', va='center', transform=ax[0].transAxes, rotation=90)
+        ax[num_images].text(-0.05, 0.5, f'{title_pre_string_b}foggy real', fontsize=title_fontsize_vertical, color='k', fontweight='black', ha='right', va='center', transform=ax[num_images].transAxes, rotation=90)
+        ax[2*num_images].text(-0.05, 0.5, f'{title_pre_string_c}ground truth', fontsize=title_fontsize_vertical, color='k', fontweight='black', ha='right', va='center', transform=ax[2*num_images].transAxes, rotation=90)
+    else:
+        ax[0].text(-0.05, 0.5, f'{title_pre_string_a}foggy real', fontsize=title_fontsize_vertical, color='k', fontweight='black', ha='right', va='center', transform=ax[0].transAxes, rotation=90)
+        ax[num_images].text(-0.05, 0.5, f'{title_pre_string_b}reconstructed', fontsize=title_fontsize_vertical, color='k', fontweight='black', ha='right', va='center', transform=ax[num_images].transAxes, rotation=90)
+        ax[2*num_images].text(-0.05, 0.5, f'{title_pre_string_c}ground truth', fontsize=title_fontsize_vertical, color='k', fontweight='black', ha='right', va='center', transform=ax[2*num_images].transAxes, rotation=90)
 
 for i in range(num_images):
-    # Reading in the fake image
-    img1 = plt.imread(os.path.join(results_path, images[i]))
-    if not change_column_order:
-        ax[3*i].imshow(img1, aspect='auto')
-        ax[3*i].axis('off')
-    else:
-        ax[1+3*i].imshow(img1, aspect='auto')
-        ax[1+3*i].axis('off')
-
-    # Reading in the fogged image
-    if not change_column_order:
-        img2 = plt.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png'))
-        ax[1+3*i].imshow(img2, aspect='auto')
-    else:
-        img2 = plt.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png'))
-        ax[3*i].imshow(img2, aspect='auto')
-
-    # Reading in the fogged image again and calculating the variance of the Laplacian
-    fogged_image_gray = cv2.cvtColor(cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png')), cv2.COLOR_BGR2GRAY)
-    
-    if not no_laplace:
-        # fm = variance_of_laplacian(fogged_image_gray)
-        # Putting the value of the variance of the Laplacian on the image
+    if not flip:
+        # Reading in the fake image
+        img1 = plt.imread(os.path.join(results_path, images[i]))
         if not change_column_order:
-            ax[1+3*i].text(0.5,0.03, '$\mathbf{v_{L}}$: %.2f' %laplacian_values[i], transform=ax[1+3*i].transAxes, backgroundcolor=cm.jet_r(norm(laplacian_values[i])), horizontalalignment='center', verticalalignment='bottom', fontsize=label_fontsize, fontweight='black', color='k' if (laplacian_values[i] > center_fog_value_limit and laplacian_values[i] < center_fog_value_limit+(max_fog_value_limit - min_fog_value_limit)*0.5) else 'w')
+            ax[3*i].imshow(img1, aspect='auto')
+            ax[3*i].axis('off')
         else:
-            ax[3*i].text(0.5,0.03, '$\mathbf{v_{L}}$: %.2f' %laplacian_values[i], transform=ax[3*i].transAxes, backgroundcolor=cm.jet_r(norm(laplacian_values[i])), horizontalalignment='center', verticalalignment='bottom', fontsize=label_fontsize, fontweight='black', color='k' if (laplacian_values[i] > center_fog_value_limit and laplacian_values[i] < center_fog_value_limit+(max_fog_value_limit - min_fog_value_limit)*0.5) else 'w')
+            ax[1+3*i].imshow(img1, aspect='auto')
+            ax[1+3*i].axis('off')
 
-    if not change_column_order:
-        ax[1+3*i].axis('off')
+        # Reading in the fogged image
+        if not change_column_order:
+            img2 = plt.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png'))
+            ax[1+3*i].imshow(img2, aspect='auto')
+        else:
+            img2 = plt.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png'))
+            ax[3*i].imshow(img2, aspect='auto')
+
+        # Reading in the fogged image again and calculating the variance of the Laplacian
+        fogged_image_gray = cv2.cvtColor(cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png')), cv2.COLOR_BGR2GRAY)
+        
+        if not no_laplace:
+            # fm = variance_of_laplacian(fogged_image_gray)
+            # Putting the value of the variance of the Laplacian on the image
+            if not change_column_order:
+                ax[1+3*i].text(0.5,0.03, '$\mathbf{v_{L}}$: %.2f' %laplacian_values[i], transform=ax[1+3*i].transAxes, backgroundcolor=cm.jet_r(norm(laplacian_values[i])), horizontalalignment='center', verticalalignment='bottom', fontsize=label_fontsize, fontweight='black', color='k' if (laplacian_values[i] > center_fog_value_limit and laplacian_values[i] < center_fog_value_limit+(max_fog_value_limit - min_fog_value_limit)*0.5) else 'w')
+            else:
+                ax[3*i].text(0.5,0.03, '$\mathbf{v_{L}}$: %.2f' %laplacian_values[i], transform=ax[3*i].transAxes, backgroundcolor=cm.jet_r(norm(laplacian_values[i])), horizontalalignment='center', verticalalignment='bottom', fontsize=label_fontsize, fontweight='black', color='k' if (laplacian_values[i] > center_fog_value_limit and laplacian_values[i] < center_fog_value_limit+(max_fog_value_limit - min_fog_value_limit)*0.5) else 'w')
+
+        if not change_column_order:
+            ax[1+3*i].axis('off')
+        else:
+            ax[3*i].axis('off')
+
+        # Reading in the clear image
+        if model_type == 'pix2pix':
+            img3 = plt.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))
+        elif model_type == 'cyclegan':
+            img3 = plt.imread(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png'))
+        ax[2+3*i].imshow(img3, aspect='auto')
+        ax[2+3*i].axis('off')
+
+        # Reading in the clear image again and calculating the SSIM to get a value for the fogginess (how much the fog changes the image) (https://stackoverflow.com/questions/71567315/how-to-get-the-ssim-comparison-score-between-two-images)
+        fogged_image_nonfloat = cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png'))
+        if model_type == 'pix2pix':
+            clear_image_nonfloat = cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))
+        elif model_type == 'cyclegan':
+            h, w, c = fogged_image_nonfloat.shape
+            clear_image_nonfloat = cv2.resize(cv2.imread(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png')), (w, h))
+
+        fake_image_nonfloat = cv2.imread(os.path.join(results_path, images[i]))
+
+        (SSIM_score, SSIM_diff) = structural_similarity(clear_image_nonfloat, fogged_image_nonfloat, full=True, multichannel=True, channel_axis=2)
+        # Putting the value of the SSIM on the image
+        if not change_column_order:
+            ax[1+3*i].text(0,1, f'SSIM: {SSIM_score:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+        else:
+            ax[3*i].text(0,1, f'SSIM: {SSIM_score:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+
+        # Calculating the Pearson correlation coefficient between the two images (https://stackoverflow.com/questions/34762661/percentage-difference-between-two-images-in-python-using-correlation-coefficient, https://mbrow20.github.io/mvbrow20.github.io/PearsonCorrelationPixelAnalysis.html)
+        clear_image_gray = cv2.cvtColor(clear_image_nonfloat, cv2.COLOR_BGR2GRAY)
+        Pearson_image_correlation = np.corrcoef(np.asarray(fogged_image_gray), np.asarray(clear_image_gray))
+        corrImAbs = np.absolute(Pearson_image_correlation)
+        # Putting the value of the Pearson correlation coefficient on the image
+        if not change_column_order:
+            ax[1+3*i].text(1,1, f'Pearson: {np.mean(corrImAbs):.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+        else:
+            ax[3*i].text(1,1, f'Pearson: {np.mean(corrImAbs):.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+
+
+        # Calculating the SSIM between the fake image and the clear image
+        (SSIM_score_reconstruction, SSIM_diff_reconstruction) = structural_similarity(clear_image_nonfloat, fake_image_nonfloat, full=True, multichannel=True, channel_axis=2)
+        # Putting the value of the SSIM on the fake image
+        if not change_column_order:
+            ax[3*i].text(0,1, f'SSIM (r): {SSIM_score_reconstruction:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+        else:
+            ax[1+3*i].text(0,1, f'SSIM (r): {SSIM_score_reconstruction:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+
+        # Calculating the CW-SSIM between the fake image and the clear image (https://github.com/jterrace/pyssim)
+        if model_type == 'pix2pix':
+            CW_SSIM = SSIM(Image.open(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
+        elif model_type == 'cyclegan':
+            CW_SSIM = 0#SSIM(Image.open(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
+        # Putting the value of the CW-SSIM on the fake image
+        if not change_column_order:
+            ax[3*i].text(1,1, f'CW-SSIM (r): {CW_SSIM:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+        else:
+            ax[1+3*i].text(1,1, f'CW-SSIM (r): {CW_SSIM:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+
+        # Calculating the MS-SSIM between the fake image and the clear image
+        if model_type == 'pix2pix':
+            real_img = np.array(Image.open(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))).astype(np.float32)
+        elif model_type == 'cyclegan':
+            real_img = np.array(Image.open(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png')).resize((w, h))).astype(np.float32)
+        real_img = torch.from_numpy(real_img).unsqueeze(0).permute(0, 3, 1, 2)
+        fake_img = np.array(Image.open(os.path.join(results_path, images[i]))).astype(np.float32)
+        fake_img = torch.from_numpy(fake_img).unsqueeze(0).permute(0, 3, 1, 2)
+        MS_SSIM = ms_ssim(real_img, fake_img, data_range=255, size_average=True).item()
+        # Putting the value of the MS-SSIM on the fake image
+        if not change_column_order:
+            ax[3*i].text(1,0, f'MS-SSIM (r): {MS_SSIM:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='bottom', fontweight='black', color='k', fontsize=label_fontsize)
+        else:
+            ax[1+3*i].text(1,0, f'MS-SSIM (r): {MS_SSIM:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='bottom', fontweight='black', color='k', fontsize=label_fontsize)
     else:
-        ax[3*i].axis('off')
+        # Reading in the fake image
+        img1 = plt.imread(os.path.join(results_path, images[i]))
+        if not change_column_order:
+            ax[i].imshow(img1, aspect='auto')
+            ax[i].axis('off')
+        else:
+            ax[num_images+i].imshow(img1, aspect='auto')
+            ax[num_images+i].axis('off')
 
-    # Reading in the clear image
-    if model_type == 'pix2pix':
-        img3 = plt.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))
-    elif model_type == 'cyclegan':
-        img3 = plt.imread(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png'))
-    ax[2+3*i].imshow(img3, aspect='auto')
-    ax[2+3*i].axis('off')
+        # Reading in the fogged image
+        img2 = plt.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png'))
+        if not change_column_order:
+            ax[num_images+i].imshow(img2, aspect='auto')
+        else:
+            ax[i].imshow(img2, aspect='auto')
 
-    # Reading in the clear image again and calculating the SSIM to get a value for the fogginess (how much the fog changes the image) (https://stackoverflow.com/questions/71567315/how-to-get-the-ssim-comparison-score-between-two-images)
-    fogged_image_nonfloat = cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png'))
-    if model_type == 'pix2pix':
-        clear_image_nonfloat = cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))
-    elif model_type == 'cyclegan':
-        h, w, c = fogged_image_nonfloat.shape
-        clear_image_nonfloat = cv2.resize(cv2.imread(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png')), (w, h))
+        # Reading in the fogged image again and calculating the variance of the Laplacian
+        fogged_image_gray = cv2.cvtColor(cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png')), cv2.COLOR_BGR2GRAY)
+        
+        if not no_laplace:
+            # fm = variance_of_laplacian(fogged_image_gray)
+            # Putting the value of the variance of the Laplacian on the image
+            if not change_column_order:
+                ax[num_images+i].text(0.5,0.03, '$\mathbf{v_{L}}$: %.2f' %laplacian_values[i], transform=ax[num_images+i].transAxes, backgroundcolor=cm.jet_r(norm(laplacian_values[i])), horizontalalignment='center', verticalalignment='bottom', fontsize=label_fontsize, fontweight='black', color='k' if (laplacian_values[i] > center_fog_value_limit and laplacian_values[i] < center_fog_value_limit+(max_fog_value_limit - min_fog_value_limit)*0.5) else 'w')
+            else:
+                ax[i].text(0.5,0.03, '$\mathbf{v_{L}}$: %.2f' %laplacian_values[i], transform=ax[i].transAxes, backgroundcolor=cm.jet_r(norm(laplacian_values[i])), horizontalalignment='center', verticalalignment='bottom', fontsize=label_fontsize, fontweight='black', color='k' if (laplacian_values[i] > center_fog_value_limit and laplacian_values[i] < center_fog_value_limit+(max_fog_value_limit - min_fog_value_limit)*0.5) else 'w')
 
-    fake_image_nonfloat = cv2.imread(os.path.join(results_path, images[i]))
+        if not change_column_order:
+            ax[num_images+i].axis('off')
+        else:
+            ax[i].axis('off')
 
-    (SSIM_score, SSIM_diff) = structural_similarity(clear_image_nonfloat, fogged_image_nonfloat, full=True, multichannel=True, channel_axis=2)
-    # Putting the value of the SSIM on the image
-    if not change_column_order:
-        ax[1+3*i].text(0,1, f'SSIM: {SSIM_score:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
-    else:
-        ax[3*i].text(0,1, f'SSIM: {SSIM_score:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+        # Reading in the clear image
+        if model_type == 'pix2pix':
+            img3 = plt.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))
+        elif model_type == 'cyclegan':
+            img3 = plt.imread(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png'))
+        ax[2*num_images+i].imshow(img3, aspect='auto')
+        ax[2*num_images+i].axis('off')
 
-    # Calculating the Pearson correlation coefficient between the two images (https://stackoverflow.com/questions/34762661/percentage-difference-between-two-images-in-python-using-correlation-coefficient, https://mbrow20.github.io/mvbrow20.github.io/PearsonCorrelationPixelAnalysis.html)
-    clear_image_gray = cv2.cvtColor(clear_image_nonfloat, cv2.COLOR_BGR2GRAY)
-    Pearson_image_correlation = np.corrcoef(np.asarray(fogged_image_gray), np.asarray(clear_image_gray))
-    corrImAbs = np.absolute(Pearson_image_correlation)
-    # Putting the value of the Pearson correlation coefficient on the image
-    if not change_column_order:
-        ax[1+3*i].text(1,1, f'Pearson: {np.mean(corrImAbs):.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
-    else:
-        ax[3*i].text(1,1, f'Pearson: {np.mean(corrImAbs):.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+        # Reading in the clear image again and calculating the SSIM to get a value for the fogginess (how much the fog changes the image) (https://stackoverflow.com/questions/71567315/how-to-get-the-ssim-comparison-score-between-two-images)
+        fogged_image_nonfloat = cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_foggy_image_addition + '.png'))
+        if model_type == 'pix2pix':
+            clear_image_nonfloat = cv2.imread(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))
+        elif model_type == 'cyclegan':
+            h, w, c = fogged_image_nonfloat.shape
+            clear_image_nonfloat = cv2.resize(cv2.imread(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png')), (w, h))
+
+        fake_image_nonfloat = cv2.imread(os.path.join(results_path, images[i]))
+
+        (SSIM_score, SSIM_diff) = structural_similarity(clear_image_nonfloat, fogged_image_nonfloat, full=True, multichannel=True, channel_axis=2)
+        # Putting the value of the SSIM on the image
+        if not change_column_order:
+            ax[num_images+i].text(0,1, f'SSIM: {SSIM_score:.2f}', transform=ax[num_images+i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+        else:
+            ax[i].text(0,1, f'SSIM: {SSIM_score:.2f}', transform=ax[i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+
+        # Calculating the Pearson correlation coefficient between the two images (https://stackoverflow.com/questions/34762661/percentage-difference-between-two-images-in-python-using-correlation-coefficient, https://mbrow20.github.io/mvbrow20.github.io/PearsonCorrelationPixelAnalysis.html)
+        clear_image_gray = cv2.cvtColor(clear_image_nonfloat, cv2.COLOR_BGR2GRAY)
+        Pearson_image_correlation = np.corrcoef(np.asarray(fogged_image_gray), np.asarray(clear_image_gray))
+        corrImAbs = np.absolute(Pearson_image_correlation)
+        # Putting the value of the Pearson correlation coefficient on the image
+        if not change_column_order:
+            ax[num_images+i].text(1,1, f'Pearson: {np.mean(corrImAbs):.2f}', transform=ax[num_images+i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+        else:
+            ax[i].text(1,1, f'Pearson: {np.mean(corrImAbs):.2f}', transform=ax[i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
 
 
-    # Calculating the SSIM between the fake image and the clear image
-    (SSIM_score_reconstruction, SSIM_diff_reconstruction) = structural_similarity(clear_image_nonfloat, fake_image_nonfloat, full=True, multichannel=True, channel_axis=2)
-    # Putting the value of the SSIM on the fake image
-    if not change_column_order:
-        ax[3*i].text(0,1, f'SSIM (r): {SSIM_score_reconstruction:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
-    else:
-        ax[1+3*i].text(0,1, f'SSIM (r): {SSIM_score_reconstruction:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+        # Calculating the SSIM between the fake image and the clear image
+        (SSIM_score_reconstruction, SSIM_diff_reconstruction) = structural_similarity(clear_image_nonfloat, fake_image_nonfloat, full=True, multichannel=True, channel_axis=2)
+        # Putting the value of the SSIM on the fake image
+        if not change_column_order:
+            ax[i].text(0,1, f'SSIM (r): {SSIM_score_reconstruction:.2f}', transform=ax[i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+        else:
+            ax[num_images+i].text(0,1, f'SSIM (r): {SSIM_score_reconstruction:.2f}', transform=ax[num_images+i].transAxes, backgroundcolor='w', horizontalalignment='left', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
 
-    # Calculating the CW-SSIM between the fake image and the clear image (https://github.com/jterrace/pyssim)
-    if model_type == 'pix2pix':
-        CW_SSIM = SSIM(Image.open(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
-    elif model_type == 'cyclegan':
-        CW_SSIM = 0#SSIM(Image.open(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
-    # Putting the value of the CW-SSIM on the fake image
-    if not change_column_order:
-        ax[3*i].text(1,1, f'CW-SSIM (r): {CW_SSIM:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
-    else:
-        ax[1+3*i].text(1,1, f'CW-SSIM (r): {CW_SSIM:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+        # Calculating the CW-SSIM between the fake image and the clear image (https://github.com/jterrace/pyssim)
+        if model_type == 'pix2pix':
+            CW_SSIM = SSIM(Image.open(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
+        elif model_type == 'cyclegan':
+            CW_SSIM = 0#SSIM(Image.open(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png'))).cw_ssim_value(Image.open(os.path.join(results_path, images[i])))
+        # Putting the value of the CW-SSIM on the fake image
+        if not change_column_order:
+            ax[i].text(1,1, f'CW-SSIM (r): {CW_SSIM:.2f}', transform=ax[i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
+        else:
+            ax[num_images+i].text(1,1, f'CW-SSIM (r): {CW_SSIM:.2f}', transform=ax[num_images+i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='top', fontweight='black', color='k', fontsize=label_fontsize)
 
-    # Calculating the MS-SSIM between the fake image and the clear image
-    if model_type == 'pix2pix':
-        real_img = np.array(Image.open(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))).astype(np.float32)
-    elif model_type == 'cyclegan':
-        real_img = np.array(Image.open(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png')).resize((w, h))).astype(np.float32)
-    real_img = torch.from_numpy(real_img).unsqueeze(0).permute(0, 3, 1, 2)
-    fake_img = np.array(Image.open(os.path.join(results_path, images[i]))).astype(np.float32)
-    fake_img = torch.from_numpy(fake_img).unsqueeze(0).permute(0, 3, 1, 2)
-    MS_SSIM = ms_ssim(real_img, fake_img, data_range=255, size_average=True).item()
-    # Putting the value of the MS-SSIM on the fake image
-    if not change_column_order:
-        ax[3*i].text(1,0, f'MS-SSIM (r): {MS_SSIM:.2f}', transform=ax[3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='bottom', fontweight='black', color='k', fontsize=label_fontsize)
-    else:
-        ax[1+3*i].text(1,0, f'MS-SSIM (r): {MS_SSIM:.2f}', transform=ax[1+3*i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='bottom', fontweight='black', color='k', fontsize=label_fontsize)
+        # Calculating the MS-SSIM between the fake image and the clear image
+        if model_type == 'pix2pix':
+            real_img = np.array(Image.open(os.path.join(results_path, images[i][:-letters_to_remove] + real_clear_image_addition + '.png'))).astype(np.float32)
+        elif model_type == 'cyclegan':
+            real_img = np.array(Image.open(os.path.join(dataset_path, images[i][:-letters_to_remove-1] + '.png')).resize((w, h))).astype(np.float32)
+        real_img = torch.from_numpy(real_img).unsqueeze(0).permute(0, 3, 1, 2)
+        fake_img = np.array(Image.open(os.path.join(results_path, images[i]))).astype(np.float32)
+        fake_img = torch.from_numpy(fake_img).unsqueeze(0).permute(0, 3, 1, 2)
+        MS_SSIM = ms_ssim(real_img, fake_img, data_range=255, size_average=True).item()
+        # Putting the value of the MS-SSIM on the fake image
+        if not change_column_order:
+            ax[i].text(1,0, f'MS-SSIM (r): {MS_SSIM:.2f}', transform=ax[i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='bottom', fontweight='black', color='k', fontsize=label_fontsize)
+        else:
+            ax[num_images+i].text(1,0, f'MS-SSIM (r): {MS_SSIM:.2f}', transform=ax[num_images+i].transAxes, backgroundcolor='w', horizontalalignment='right', verticalalignment='bottom', fontweight='black', color='k', fontsize=label_fontsize)
+
+        
 
 # plt.figure(figsize=(15,10))
 
