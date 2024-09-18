@@ -1,5 +1,7 @@
-# STEREOFOG - Computational DeFogging via Image-to-Image Translation on a real-world Dataset ![Visitors](https://api.visitorbadge.io/api/visitors?path=apoll2000%2Fstereofog&countColor=%23263759)
-[<img src="https://cdn.nwe.io/files/x/38/3a/21ef080a98959283d708c2a22f2a.jpg" height="18">](https://doi.org/10.1364/OE.532576) | [<img src="https://static-00.iconduck.com/assets.00/arxiv-icon-1024x301-v4aiipf1.png" height="16">](http://arxiv.org/abs/2312.02344) | [<img src="https://www.edigitalagency.com.au/wp-content/uploads/YouTube-icon-red-png.png" height="16">](https://youtu.be/P8lyz_wZo2c)
+# STEREOFOG - Image-to-image machine translation enables computational defogging in real-world images ![Visitors](https://api.visitorbadge.io/api/visitors?path=apoll2000%2Fstereofog&countColor=%23263759)
+[<img src="https://mms.businesswire.com/media/20220126006061/en/1340601/22/Optica_logo_trans_vert_white_on_black.jpg" height="30">](https://doi.org/10.1364/OE.532576) | [<img src="https://www.edigitalagency.com.au/wp-content/uploads/YouTube-icon-red-png.png" height="28">](https://youtu.be/P8lyz_wZo2c)
+
+In case the Optica link above doesn't work (by clicking on the image), the paper is available here: [GDrive](https://drive.google.com/file/d/1dF6amdbTFjtzVqdbi9FPOLqjNvrFDyOy/view?usp=sharing) | [tubcloud](https://tubcloud.tu-berlin.de/s/xngQjstaPwA2SxL)
 
 The STEREOFOG dataset is available here: [GDrive](https://drive.google.com/drive/folders/1Tzo1lDyHiiTZUwWrtjHaJ5GObJZZZMe1?usp=share_link) | [tubcloud](https://tubcloud.tu-berlin.de/s/eXwHQyfbzkbTdej)
 
