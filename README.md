@@ -10,7 +10,7 @@ The Supplement 1 PDF is available here: [GDrive](https://drive.google.com/file/d
 ## Graphical Abstract
 <p align="center">
 <img src="images/paper_headline_image.png" alt="Graphical abstract" width="700"/>
-<figcaption align = "center"><b>Overview of the STEREOFOG project. a): A diagram summarizing the work done in this work. b): Example results obtained by applying the pix2pix framework to the STEREOFOG dataset. Our approach works for a range of fog densities.</b></figcaption>
+<figcaption align = "center"><b>Overview of the STEREOFOG project. a): A diagram summarizing the work done in this project. b): Example results obtained by applying the pix2pix framework to the STEREOFOG dataset. Our approach works for a range of fog densities.</b></figcaption>
 </p>
 
 ## News
